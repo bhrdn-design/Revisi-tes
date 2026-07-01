@@ -9,7 +9,7 @@
   --bg: #07111f; --bg2: #0c172a; --surface: #111c31; --surface2: #16233b; --card: #101a2e;
   --line: #2b4269; --line2: #395780; --text: #eaf2ff; --muted: #9fb0c8; --soft: #c7d6ec;
   --green: #17c985; --green2: #0ea56e; --blue: #5aa9ff; --gold: #f2b84b; --red: #ff6b6b;
-  --shadow: 0 18px 50px rgba(0,0,0,.32); --radius: 12px;
+  --shadow: 0 18px 50px rgba(0,0,0,.32); --radius: 12px; 
   --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
 }
@@ -141,7 +141,7 @@ tr:nth-child(even) td { background: rgba(255,255,255,.015); }
   <section id="page-hisab" class="page active">
     <div class="card">
       <div class="title">📍 Lokasi & Waktu Hisab (Markaz)</div>
-
+      
       <div class="grid-3">
         <div><label>Nama Tempat / Kota</label><input id="h_kota" type="text" value="Jakarta"></div>
         <div>
@@ -161,7 +161,7 @@ tr:nth-child(even) td { background: rgba(255,255,255,.015); }
           </select>
         </div>
       </div>
-
+      
       <div class="grid-2">
         <div>
           <label>Bujur Tempat (Longitude)</label>
@@ -194,7 +194,7 @@ tr:nth-child(even) td { background: rgba(255,255,255,.015); }
         </div>
         <div><label>Tahun Hijriyah</label><input type="number" id="h_tahunH" value="1446"></div>
       </div>
-
+      
       <div class="grid-2">
         <div>
           <label>Kriteria Imkan Rukyat</label>
@@ -311,7 +311,7 @@ tr:nth-child(even) td { background: rgba(255,255,255,.015); }
   <section id="page-gerhana" class="page">
     <div class="card">
       <div class="title">📍 Parameter Gerhana Bulan (Khusuf al-Qamar)</div>
-
+      
       <div class="grid-3">
         <div><label>Nama Tempat / Kota</label><input id="g_kota" type="text" value="Jakarta"></div>
         <div><label>Ketinggian (m. dpl)</label><input id="g_tt" type="number" value="10"></div>
@@ -331,10 +331,10 @@ tr:nth-child(even) td { background: rgba(255,255,255,.015); }
             <option value="masehi">Tanggal, Bulan, Tahun Masehi</option>
           </select>
         </div>
-
+        
         <div class="g-mode-h"><label>Bulan Hijriyah</label><select id="g_bulanH"></select></div>
         <div class="g-mode-h"><label>Tahun Hijriyah</label><input type="number" id="g_tahunH" value="1446"></div>
-
+        
         <div class="g-mode-m" style="display:none;"><label>Tanggal Masehi</label><input type="number" id="g_tglM" value="15" min="1" max="31"></div>
         <div class="g-mode-m" style="display:none;"><label>Bulan Masehi</label><input type="number" id="g_blnM" value="9" min="1" max="12"></div>
         <div class="g-mode-m" style="display:none;"><label>Tahun Masehi</label><input type="number" id="g_thnM" value="2024"></div>
@@ -414,29 +414,27 @@ tr:nth-child(even) td { background: rgba(255,255,255,.015); }
 <script>
 // --- MATH & UTILS CONSTANTS ---
 const PI = Math.PI, D2R = PI / 180, R2D = 180 / PI;
-function sind(x){return Math.sin(x*D2R)}
-function cosd(x){return Math.cos(x*D2R)}
+function sind(x){return Math.sin(x*D2R)} 
+function cosd(x){return Math.cos(x*D2R)} 
 function tand(x){return Math.tan(x*D2R)}
-function asind(x){return Math.asin(Math.max(-1,Math.min(1,x)))*R2D}
+function asind(x){return Math.asin(Math.max(-1,Math.min(1,x)))*R2D} 
 function acosd(x){return Math.acos(Math.max(-1,Math.min(1,x)))*R2D}
 function atand(x){return Math.atan(x)*R2D}
-function atan2d(y, x){return Math.atan2(y, x)*R2D}
 function mod(x, m){return ((x%m)+m)%m}
 function mod360(x){return mod(x, 360)}
 function frac(x){return x - Math.floor(x)}
 function fix(x){return Math.floor(x)}
 function norm180(x){let a = mod(x+180, 360)-180; return a === -180 ? 180 : a}
-function clamp(x, a, b){return Math.max(a, Math.min(b, x))}
 
 // --- FORMATTING HELPERS ---
 function fmtNum(x, dp=7) {
-  if (x === null || x === undefined || Number.isNaN(x) || !Number.isFinite(Number(x))) return '—';
+  if (x === null || x === undefined || Number.isNaN(x)) return '—';
   let v = Number(x); let s = v.toFixed(dp);
   return s.replace(/(\.\d*?[1-9])0+$/, '$1').replace(/\.0+$/, '');
 }
 
 function fmtDMS(x, isTime = false) {
-  if (x === null || x === undefined || Number.isNaN(x) || !Number.isFinite(Number(x))) return '—';
+  if (x === null || x === undefined || Number.isNaN(x)) return '—';
   let sign = x < 0 ? '-' : '';
   let a = Math.abs(x);
   let d = Math.floor(a);
@@ -445,7 +443,7 @@ function fmtDMS(x, isTime = false) {
   let s = (mf - m) * 60;
   if (s >= 59.995) { s = 0; m += 1; }
   if (m >= 60) { m = 0; d += 1; }
-
+  
   if (isTime) {
     let hh = d % 24;
     return `${String(hh).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(Math.round(s)).padStart(2,'0')}`;
@@ -455,7 +453,7 @@ function fmtDMS(x, isTime = false) {
 
 function fmtJam(h) {
   if (h === null || h === undefined || Number.isNaN(h) || !Number.isFinite(h)) return '—';
-  return fmtDMS(mod(h, 24), true);
+  return fmtDMS(mod(h, 24), true); // Reusing logic for perfect HH:MM:SS
 }
 
 function coordToDec(d, m, s, dir) {
@@ -472,14 +470,14 @@ function initDropdowns() {
   const hb1 = document.getElementById('h_bulanAkhir');
   const hb2 = document.getElementById('h_bulanAwal');
   const gb = document.getElementById('g_bulanH');
-
+  
   NAMA_BULAN_H.forEach((b, i) => {
     let o1 = new Option((i+1)+". "+b, i+1);
     let o2 = new Option((i+1)+". "+b, i+1);
     let o3 = new Option((i+1)+". "+b, i+1);
     hb1.add(o1); hb2.add(o2); gb.add(o3);
   });
-
+  
   // Default Akhir Ramadhan -> Awal Syawal
   hb1.value = "9"; hb2.value = "10"; gb.value = "9";
 }
@@ -489,7 +487,7 @@ function syncBulan(trigger) {
   const bAwal = document.getElementById('h_bulanAwal');
   let v1 = parseInt(bAkhir.value);
   let v2 = parseInt(bAwal.value);
-
+  
   if(trigger === 'akhir') {
     bAwal.value = v1 === 12 ? 1 : v1 + 1;
   } else {
@@ -541,15 +539,15 @@ function autoGPS(prefix) {
   const stat = document.getElementById(`${prefix}_gps_status`);
   if (!navigator.geolocation) { stat.textContent = "Browser tidak support GPS."; return; }
   stat.textContent = "Mencari koordinat GPS...";
-
+  
   navigator.geolocation.getCurrentPosition(async pos => {
     let lat = pos.coords.latitude, lon = pos.coords.longitude;
-    let tzOffset = -new Date().getTimezoneOffset() / 60;
-
+    let tzOffset = -new Date().getTimezoneOffset() / 60; // Browser TZ
+    
     let aLat = Math.abs(lat), aLon = Math.abs(lon);
     let dLat = Math.floor(aLat), mLat = Math.floor((aLat-dLat)*60), sLat = ((aLat-dLat)*60 - mLat)*60;
     let dLon = Math.floor(aLon), mLon = Math.floor((aLon-dLon)*60), sLon = ((aLon-dLon)*60 - mLon)*60;
-
+    
     if(prefix === 'h') {
       document.getElementById('h_lat_d').value = dLat; document.getElementById('h_lat_m').value = mLat; document.getElementById('h_lat_s').value = sLat.toFixed(2);
       document.getElementById('h_lat_dir').value = lat >= 0 ? "1" : "-1";
@@ -559,7 +557,7 @@ function autoGPS(prefix) {
     } else {
       document.getElementById('g_tz').value = tzOffset;
     }
-
+    
     let nama = await reverseGeocode(lat, lon);
     if(nama) document.getElementById(`${prefix}_kota`).value = nama;
     stat.textContent = `📍 Ditemukan: Lat ${lat.toFixed(4)}, Lon ${lon.toFixed(4)} (Akurasi: ${Math.round(pos.coords.accuracy)}m)`;
@@ -593,66 +591,21 @@ function konversi(jd, tz) {
   let A = Z + 1 + AA - fix(AA / 4);
   let B = A + 1524, C = fix((B - 122.1)/365.25), D = fix(365.25 * C), E = fix((B - D)/30.6001);
   let Tgl = fix(B - D - fix(30.6001 * E));
-  let Bln = E < 14 ? E - 1 : E - 13;
+  let Bln = E - 1;
   let Thn = Bln <= 2 ? C - 4715 : C - 4716;
   let WI = frac(jd) * 24, WD = WI + tz;
-
+  
   let Hr = mod(Z + 2, 7);
   let Ps = mod(Z + 1, 5);
-
-  // Pembenahan tanggal lokal agar tidak salah saat melewati jam 24 atau mundur hari.
-  let local = jdToMasehi(jd + tz/24);
-  let localZ = fix(jd + tz/24);
-  let HrFix = mod(localZ + 2, 7);
-  let PsFix = mod(localZ + 1, 5);
-  let WDFix = mod(WD, 24);
+  
+  // Jika WD melebihi 24 jam atau kurang dari 0
+  let TglFix = Tgl, BlnFix = Bln, ThnFix = Thn, HrFix = Hr, PsFix = Ps, WDFix = WD;
+  if(WD >= 24) { WDFix -= 24; HrFix = mod(Hr+1, 7); PsFix = mod(Ps+1, 5); TglFix += 1; /* simplifikasi tgl +1 (mengabaikan lintas bulan di UI konversi murni) */ }
+  if(WD < 0) { WDFix += 24; HrFix = mod(Hr-1, 7); PsFix = mod(Ps-1, 5); TglFix -= 1; }
 
   return { Z, AA, A, B, C, D, E, Tgl, Bln, Thn, WI, WD, Hr, Ps,
-           hari: HARI[HrFix], pasaran: PASARAN[PsFix],
-           tglF: local.d, blnF: local.m, thnF: local.y, wdF: WDFix };
-}
-
-// --- PEMBENAHAN DATA BULAN: helper astronomi yang lebih stabil ---
-function localSiderealTime(jd, lon) {
-  let T = (jd - 2451545.0) / 36525;
-  let theta = 280.46061837 + 360.98564736629 * (jd - 2451545.0) + 0.000387933 * T * T - (T * T * T) / 38710000;
-  return mod360(theta + lon);
-}
-
-function eclipticToEquatorial(lambda, beta, eps) {
-  let alpha = mod360(atan2d(sind(lambda) * cosd(eps) - tand(beta) * sind(eps), cosd(lambda)));
-  let delta = asind(sind(beta) * cosd(eps) + cosd(beta) * sind(eps) * sind(lambda));
-  return { alpha, delta };
-}
-
-function horizontalFromEquatorial(alpha, delta, lat, jd, lon) {
-  let lst = localSiderealTime(jd, lon);
-  let H = norm180(lst - alpha);
-  let alt = asind(sind(lat) * sind(delta) + cosd(lat) * cosd(delta) * cosd(H));
-  let az = mod360(atan2d(-sind(H), tand(delta) * cosd(lat) - sind(lat) * cosd(H)));
-  return { lst, H, alt, az };
-}
-
-function refractionBennett(h) {
-  if (!Number.isFinite(h) || h < -5) return 0;
-  return (1.02 / tand(h + 10.3 / (h + 5.11))) / 60;
-}
-
-function moonSetDeltaHours(hcTengah, Hmoon, deltac, lat, sdc) {
-  if (!Number.isFinite(hcTengah) || hcTengah <= 0) return 0;
-  let h0 = -sdc;
-  let cosHset = (sind(h0) - sind(lat) * sind(deltac)) / (cosd(lat) * cosd(deltac));
-  if (!Number.isFinite(cosHset)) return 0;
-  if (cosHset < -1) return 12;
-  if (cosHset > 1) return 0;
-  let Hset = acosd(cosHset);
-  let Hnow = mod360(Hmoon);
-  if (Hnow > 180) Hnow -= 360;
-  let diff = Hset - Hnow;
-  if (diff < 0) diff += 360;
-  let hours = diff / 14.492; // laju sudut jam Bulan kira-kira 14,492° per jam.
-  if (hours > 24) return 0;
-  return hours;
+           hari: HARI[HrFix], pasaran: PASARAN[PsFix], 
+           tglF: TglFix, blnF: BlnFix, thnF: ThnFix, wdF: WDFix };
 }
 
 // --- ALGORITMA HISAB AWAL BULAN ---
@@ -673,7 +626,7 @@ function hitungHisab() {
     let T = K / 1200;
     let JD = 2447740.652 + 29.53058868 * K + 0.0001178 * T * T;
     let M = mod360(29.10535608 * K + 207.9587074 - 0.0000333 * T * T);
-    let Mp = mod360(385.81691806 * K + 111.1791307 + 0.0107306 * T * T);
+    let Mp = mod360(385.81691806 * K + 111.1791307 + 0.0107306 * T * T); // M'
     let F = mod360(390.67050646 * K + 164.2162296 - 0.0016528 * T * T);
     let T1 = (0.1734 - 0.000395 * T) * sind(M);
     let T2 = 0.0021 * sind(2 * M);
@@ -691,7 +644,7 @@ function hitungHisab() {
     let MT = T1 + T2 + T3 + T4 + T5 + T6 + T7 + T8 + T9 + T10 + T11 + T12 + T13;
     let JD_Ijt = JD + 0.5 + MT;
     let JD_Ex = JD_Ijt - 2415019;
-
+    
     let konv = konversi(JD_Ijt, tz);
 
     let htmlT1 = [
@@ -736,29 +689,29 @@ function hitungHisab() {
     let loc = jdToMasehi(JD_Ijt + tz/24);
     let jd0 = gregorianToJD(loc.y, loc.m, loc.d, 18, tz);
     let sun0 = calcSun(jd0.JD, jd0.T, lat, lon, tz, tt);
-
+    
     // Apakah ijtimak terjadi sesudah ghurub hari itu?
     let obsD = loc.d;
     if (loc.h > mod(sun0.GrWD, 24)) { obsD += 1; }
-
+    
     let jdG = gregorianToJD(loc.y, loc.m, obsD, 18, tz);
     let sunG = calcSun(jdG.JD, jdG.T, lat, lon, tz, tt);
-
+    
     // Iterasi kedua untuk JD yang tepat di waktu maghrib
     let jdFinal = gregorianToJD(loc.y, loc.m, obsD, mod(sunG.GrWD, 24), tz);
     let sun = calcSun(jdFinal.JD, jdFinal.T, lat, lon, tz, tt);
-
+    
     let moon = calcMoon(jdFinal.JD, jdFinal.T, sun, lat, lon, tt);
 
     // PENYEMPURNAAN UMUR BULAN TERKONEKSI PENUH: JD Matahari Terbenam dikurangi JD Ijtima' dikali 24 jam
     moon.umur = (jdFinal.JD - JD_Ijt) * 24;
 
     let htmlJD = [
-      tRow2('A','Int(ThnM/100)', jdFinal.A),
+      tRow2('A','Int(ThnM/100)', jdFinal.A), 
       tRow2('B','2-A+Int(A/4)', jdFinal.B),
-      tRow2('BYDH','If(BulanM<3, BulanM+12, BulanM)', jdFinal.BYDH),
+      tRow2('BYDH','If(BulanM<3, BulanM+12, BulanM)', jdFinal.BYDH), 
       tRow2('TYDH','If(BulanM<3, TahunM-1, TahunM)', jdFinal.TYDH),
-      tRow2('JD','Int(365.25 × (TYDH+4716)) + Int(30.6001 × (BYDH+1)) + ...', fmtNum(jdFinal.JD)),
+      tRow2('JD','Int(365.25 × (TYDH+4716)) + Int(30.6001 × (BYDH+1)) + ...', fmtNum(jdFinal.JD)), 
       tRow2('T','(JD - 2451545) / 36525', fmtNum(jdFinal.T)),
       tRow2('Dip','1.76/60 × √TT', `${fmtNum(sun.Dip)} &nbsp; | &nbsp; <span style="color:var(--gold); font-family:var(--mono);">${fmtDMS(sun.Dip)}</span>`)
     ].join('');
@@ -829,7 +782,7 @@ function hitungHisab() {
       tRow("hc' [piringan atas]","If(hc' a > 0, hc' a + s.d.c + Ref + Dip, hc' a)", fmtNum(moon.hcAtas), fmtDMS(moon.hcAtas)),
       tRow("hc' [piringan tengah]","If(hc' a > 0, hc' a + Ref + Dip, hc' a)", fmtNum(moon.hcTengah), fmtDMS(moon.hcTengah)),
       tRow("hc' [piringan bawah]","If(hc' a > 0, hc' a - s.d.c + Ref + Dip, hc' a)", fmtNum(moon.hcBawah), fmtDMS(moon.hcBawah)),
-
+      
       tRow('Umur',"Ghurub (Gr WD) – Waktu Ijtima' (WD)", fmtNum(moon.umur), fmtJam(moon.umur)),
       tRow('Azm',"Tan⁻¹( ((-Sin(Lt) / Tan(t)) + Cos(Lt) × Tan(δ) / Sin(t)))+270", fmtNum(sun.Azm), fmtDMS(sun.Azm)),
       tRow('Azc',"Tan⁻¹( ((-Sin(Lt) / Tan(tc)) + Cos(Lt) × Tan(δc) / Sin(tc)))+270", fmtNum(moon.Azc), fmtDMS(moon.Azc)),
@@ -864,7 +817,7 @@ function hitungHisab() {
     document.getElementById('p_azc').textContent = fmtDMS(moon.Azc);
     document.getElementById('p_z').textContent = fmtDMS(moon.z);
     document.getElementById('p_hc').textContent = fmtDMS(moon.hc);
-    document.getElementById('p_hcp').textContent = fmtDMS(moon.hcTengah);
+    document.getElementById('p_hcp').textContent = fmtDMS(moon.hcTengah); // Mar'i
     document.getElementById('p_umur').textContent = fmtJam(moon.umur);
     document.getElementById('p_el').textContent = fmtDMS(moon.EL);
     document.getElementById('p_fi').textContent = fmtNum(moon.FI, 2) + '%';
@@ -877,22 +830,22 @@ function hitungHisab() {
     let kriteria = document.getElementById('h_kriteria').value;
     let hilalTerlihat = false;
     let h_mari = moon.hcTengah, elong = moon.EL, umur = moon.umur;
-
+    
     if(kriteria === 'mabims') hilalTerlihat = (h_mari >= 3 && elong >= 6.4);
     else if(kriteria === 'wujudul') hilalTerlihat = (h_mari > 0 && umur > 0);
     else if(kriteria === 'danjon') hilalTerlihat = (elong >= 7);
 
-    let jd1 = wdJD;
+    let jd1 = wdJD; 
     // Bila memenuhi, 1 tanggal masehi setelah observasi adalah tanggal 1 hijriyah
     if(hilalTerlihat) {
       jd1 += 1;
     } else {
       // Istikmal, 1 tanggal masehi + 2
-      jd1 += 2;
+      jd1 += 2; 
     }
-    let resMasehi = jdToMasehi(jd1 - 0.5);
+    let resMasehi = jdToMasehi(jd1 - 0.5); // mid day back to Masehi
     let kesimpulanHari = HARI[mod(jd1 + 1, 7)];
-
+    
     document.getElementById('p_k_awalbulan').textContent = NAMA_BULAN_H[bAwal-1];
     document.getElementById('p_k_hari').textContent = kesimpulanHari;
     document.getElementById('p_k_tgl').textContent = `${resMasehi.d} ${NAMA_BULAN_M[resMasehi.m]} ${resMasehi.y}`;
@@ -908,7 +861,7 @@ function hitungHisab() {
 }
 
 function calcSun(jd, T, lat, lon, tz, tt) {
-  let Dip = (1.76 / 60) * Math.sqrt(Math.max(0, tt));
+  let Dip = (1.76 / 60) * Math.sqrt(tt);
   let S = mod360(280.46645 + 36000.76983 * T);
   let m = mod360(357.5291 + 35999.0503 * T);
   let N = mod360(125.04 - 1934.136 * T);
@@ -957,51 +910,52 @@ function calcMoon(jd, T, sun, lat, lon, tt) {
   let Mo = mod360(M + C + sun.Kp + sun.Kpp - (20.47 / 3600));
   let Ap = A + T2 + T3 + T5;
   let Lp = (18461/3600)*sind(F) + (1010/3600)*sind(A+F) + (1000/3600)*sind(A-F) - (624/3600)*sind(F-2*D) - (199/3600)*sind(A-F-2*D) - (167/3600)*sind(A+F-2*D);
-
+  
   let x = atand(sind(Mo) * tand(sun.Qp));
   let y = Lp + x;
-
-  // Pembenahan inti Data Bulan:
-  // koordinat ekliptika Bulan (Mo, L') dikonversi ke asensio rekta dan deklinasi dengan atan2,
-  // sehingga kuadran tidak tertukar dan tinggi/azimuth Bulan tidak melompat salah.
-  let eqMoon = eclipticToEquatorial(Mo, Lp, sun.Qp);
-  let deltac = eqMoon.delta;
-  let PTc = eqMoon.alpha;
-  let Ptca = PTc;
-
-  let horMoon = horizontalFromEquatorial(PTc, deltac, lat, jd, lon);
-  let tc = mod360(horMoon.H);
-  let hc = horMoon.alt;
-
+  
+  // PENGAMANAN PEMBAGIAN NOL PADA DEKLINASI BULAN (δc)
+  let sinx = sind(x);
+  let deltac = (Math.abs(sinx) < 1e-8) ?
+               asind(sind(Lp)*cosd(sun.Qp) + cosd(Lp)*sind(sun.Qp)*sind(Mo)) :
+               asind(sind(Mo) * sind(sun.Qp) * sind(y) / sinx);
+               
+  let Ptca = acosd(cosd(Mo) * cosd(Lp) / cosd(deltac));
+  let PTc = Mo > 180 ? 360 - Ptca : Ptca;
+  let tc = mod360(sun.PT - PTc + sun.t);
+  let hc = asind(sind(lat) * sind(deltac) + cosd(lat) * cosd(deltac) * cosd(tc));
   let p = (384401 * (1 - 0.00301401)) / (1 + 0.0549 * cosd(Ap + T1));
   let HP = 0.9507 / (p / 384401);
   let sdc = 0.5181 / (p / 384401) / 2;
   let P = HP * cosd(hc);
   let hca = hc - P;
-
-  // Refraksi dibuat stabil memakai rumus Bennett agar hasil tidak NaN saat dekat ufuk.
-  let Ref = refractionBennett(hca);
-
+  
+  // PENYEMPURNAAN REFRAKSI DAN KETINGGIAN (Tidak lagi dinol-kan saat di bawah ufuk)
+  // Refraksi tetap dihitung dengan batas ufuk hingga -5 derajat ke bawah agar stabil
+  let Ref = 0; 
+  if (hca > -5.0) {
+    Ref = 0.0167 / tand(hca + 7.31 / (hca + 4.4));
+  }
+  
   let hcAtas = hca + sdc + Ref + sun.Dip;
   let hcTengah = hca + Ref + sun.Dip;
   let hcBawah = hca - sdc + Ref + sun.Dip;
-
-  let Azc = horMoon.az;
-  let z = norm180(Azc - sun.Azm);
-
-  // Lama hilal di atas ufuq dihitung dari posisi Bulan saat ghurub sampai Bulan terbenam.
-  let Dc = moonSetDeltaHours(hcTengah, horMoon.H, deltac, lat, sdc);
-
-  let AL = acosd(cosd(Math.abs(hcTengah - sun.h)) * cosd(Math.abs(z)));
+  
+  let Azc = mod360(atand(((-sind(lat) / tand(tc)) + cosd(lat) * tand(deltac)) / sind(tc)) + 270);
+  let z = Azc - sun.Azm;
+  let Dc = PTc < sun.PT ? ((PTc + 360) - sun.PT) / 15 : (PTc - sun.PT) / 15;
+  let AL = acosd(cosd(Math.abs(hcTengah - sun.h)) * cosd(Math.abs(Azc - sun.Azm)));
   let Cw = (1 - cosd(AL)) * sdc * 60;
   let EL = acosd(cosd(Mo - sun.Sp) * cosd(Lp));
   let FIa = acosd(-cosd(EL));
-
+  
+  // Mengikuti formula UI orisinal
   let FI = hcTengah < 0 ? 0 : ((1 + cosd(FIa)) / 2) * 100;
   let Ms = sun.GrWD + Dc;
   let Mukts = hcTengah < 0 ? 0 : Dc;
-
-  let Miring = Math.abs(hcTengah) < 1e-6 ? 0 : atand(z / hcTengah);
+  
+  // Pengamanan pembagian nol pada Kemiringan Hilal
+  let Miring = Math.abs(hcTengah) < 1e-6 ? 0 : atand((Azc - sun.Azm) / hcTengah);
 
   return { M, A, F, D, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, C, Mo, Ap, Lp, x, y, deltac, Ptca, PTc, tc, hc, p, HP, sdc, P, Ref, hca, hcAtas, hcTengah, hcBawah, Azc, z, Dc, AL, Cw, EL, FIa, FI, Ms, Mukts, Miring, umur: 0 };
 }
@@ -1041,7 +995,7 @@ function hitungGerhana() {
     let F1 = F - 0.02665 * sind(Om);
     let A1 = 285.9142682 + 0.107408*K - 0.009173*T2;
     let E = 1 - 0.002516*T - 0.0000074*T2;
-
+    
     let T1 = -0.4065 * sind(Mp);
     let T2_ = 0.1727 * E * sind(M);
     let T3_ = 0.0161 * sind(2*Mp);
@@ -1059,10 +1013,10 @@ function hitungGerhana() {
     let T15 = -0.0002 * E * sind(2*Mp - M);
     let T16 = -0.0002 * sind(Om);
     let MT = T1+T2_+T3_+T4+T5+T6+T7+T8+T9+T10+T11+T12+T13+T14+T15+T16;
-
+    
     let JD_Ist = JD + 0.5 + MT + tz/24;
     let T0 = frac(JD_Ist) * 24;
-    let konvG = konversi(JD_Ist, 0);
+    let konvG = konversi(JD_Ist, 0); // Already tz-adjusted manually above for UI
 
     let htmlDasar = [
       mode==='hijri' ? tRow('HY','TahunH+(BlnH×29.53)/354.3671', fmtNum(K+1410), '—') : '',
@@ -1118,7 +1072,7 @@ function hitungGerhana() {
     let U1 = 0.0046 * E * cosd(M), U2 = -0.0182 * cosd(Mp), U3 = 0.0004 * cosd(2*Mp), U4 = -0.0005 * cosd(M+Mp);
     let U = 0.00059 + U1+U2+U3+U4;
     let H = 1.5573 + U, P = 1.0128 - U, R = 0.4678 - U, N = 0.5458 + 0.04 * cosd(Mp);
-
+    
     let MG = (1.0128 - U - Math.abs(Y)) / 0.545;
     let status = MG <= 0 ? "Tidak Gerhana" : (MG < 1 ? "Partial (Sebagian)" : "Gerhana Total");
 
@@ -1173,9 +1127,9 @@ function hitungGerhana() {
     document.getElementById('p_g_target').textContent = targetTxt;
     document.getElementById('p_g_status').textContent = status;
     document.getElementById('p_g_status').style.color = (status === "Tidak Gerhana") ? "red" : "green";
-
+    
     document.querySelectorAll('.p_g_tz').forEach(e => e.textContent = tzName(tz));
-
+    
     document.getElementById('e_w1').textContent = fmtT(W1);
     document.getElementById('e_w2').textContent = fmtT(W2);
     document.getElementById('e_w3').textContent = fmtT(W3);
@@ -1195,5 +1149,809 @@ function hitungGerhana() {
 // Inisialisasi
 window.onload = () => { initDropdowns(); toggleGMode(); };
 </script>
+
+<!-- PATCH FALAK ENGINE - mulai -->
+<script>
+/*
+  falak-engine-patch-irsyadul-murid.js
+  Patch logic perhitungan astronomi untuk HTML yang sudah ada.
+  Cara pasang:
+  1) Simpan file ini di folder yang sama dengan HTML.
+  2) Tambahkan sebelum &lt;/body&gt; dan SETELAH script lama:
+     &lt;script src=&quot;falak-engine-patch-irsyadul-murid.js&quot;&gt;&lt;/script&gt;
+
+  Catatan:
+  - UI/HTML tidak diubah.
+  - Fungsi hitungHisab(), hitungGerhana(), jdToMasehi(), gregorianToJD(),
+    konversi(), calcSun(), calcMoon() dioverride agar kompatibel dengan output lama.
+  - Engine memakai algoritma Meeus/truncated lunar periodic terms. Untuk akurasi JPL DE440 penuh,
+    perlu file ephemeris JPL atau API eksternal.
+*/
+
+(function(){
+  &#x27;use strict&#x27;;
+
+  // =========================
+  // FALAK ENGINE: UTC/JD + MEEUS POSITION
+  // =========================
+  const FE = (() =&gt; {
+    const PI = Math.PI, D2R = PI / 180, R2D = 180 / PI;
+    const AU_KM = 149597870.7, ER_KM = 6378.14;
+
+    const sin = x =&gt; Math.sin(x * D2R);
+    const cos = x =&gt; Math.cos(x * D2R);
+    const tan = x =&gt; Math.tan(x * D2R);
+    const asin = x =&gt; Math.asin(Math.max(-1, Math.min(1, x))) * R2D;
+    const acos = x =&gt; Math.acos(Math.max(-1, Math.min(1, x))) * R2D;
+    const atan2 = (y, x) =&gt; Math.atan2(y, x) * R2D;
+    const mod = (x, m) =&gt; ((x % m) + m) % m;
+    const mod360 = x =&gt; mod(x, 360);
+    const norm180 = x =&gt; {
+      const a = mod(x + 180, 360) - 180;
+      return a === -180 ? 180 : a;
+    };
+
+    function jdUTC(y, m, d, h = 0, mi = 0, s = 0) {
+      let Y = y, M = m;
+      if (M &lt;= 2) { Y -= 1; M += 12; }
+      const A = Math.floor(Y / 100);
+      const B = 2 - A + Math.floor(A / 4);
+      return Math.floor(365.25 * (Y + 4716)) +
+             Math.floor(30.6001 * (M + 1)) +
+             d + B - 1524.5 + (h + mi / 60 + s / 3600) / 24;
+    }
+
+    function fromJD(jd) {
+      let Z = Math.floor(jd + 0.5);
+      let F = jd + 0.5 - Z;
+      let A = Z;
+      if (Z &gt;= 2299161) {
+        const alpha = Math.floor((Z - 1867216.25) / 36524.25);
+        A = Z + 1 + alpha - Math.floor(alpha / 4);
+      }
+      const B = A + 1524;
+      const C = Math.floor((B - 122.1) / 365.25);
+      const D = Math.floor(365.25 * C);
+      const E = Math.floor((B - D) / 30.6001);
+      const day = B - D - Math.floor(30.6001 * E) + F;
+      const m = E &lt; 14 ? E - 1 : E - 13;
+      const y = m &gt; 2 ? C - 4716 : C - 4715;
+      const d = Math.floor(day);
+      const hh = (day - d) * 24;
+      const h = Math.floor(hh);
+      const mm = (hh - h) * 60;
+      const mi = Math.floor(mm);
+      const s = (mm - mi) * 60;
+      return { y, m, d, h, mi, s };
+    }
+
+    function deltaTSeconds(jd) {
+      const c = fromJD(jd);
+      const y = c.y + (c.m - 0.5) / 12;
+      if (y &gt;= 2005 &amp;&amp; y &lt; 2050) {
+        const t = y - 2000;
+        return 62.92 + 0.32217 * t + 0.005589 * t * t;
+      }
+      if (y &gt;= 1986 &amp;&amp; y &lt; 2005) {
+        const t = y - 2000;
+        return 63.86 + 0.3345 * t - 0.060374 * t * t +
+               0.0017275 * t ** 3 + 0.000651814 * t ** 4 +
+               0.00002373599 * t ** 5;
+      }
+      const u = (y - 2000) / 100;
+      return 64.7 + 64.5 * u + 30 * u * u;
+    }
+
+    function jdeTT(jd) {
+      return jd + deltaTSeconds(jd) / 86400;
+    }
+
+    function meanObliquity(T) {
+      const sec = 21.448 - T * (46.8150 + T * (0.00059 - T * 0.001813));
+      return 23 + 26 / 60 + sec / 3600;
+    }
+
+    function eclToEq(lon, lat, eps) {
+      const ra = atan2(sin(lon) * cos(eps) - tan(lat) * sin(eps), cos(lon));
+      const dec = asin(sin(lat) * cos(eps) + cos(lat) * sin(eps) * sin(lon));
+      return { ra: mod360(ra), dec };
+    }
+
+    function sun(jd) {
+      const T = (jdeTT(jd) - 2451545.0) / 36525;
+      const L0 = mod360(280.46646 + 36000.76983 * T + 0.0003032 * T * T);
+      const M = mod360(357.52911 + 35999.05029 * T - 0.0001537 * T * T + T ** 3 / 24490000);
+      const e = 0.016708634 - 0.000042037 * T - 0.0000001267 * T * T;
+      const C =
+        (1.914602 - 0.004817 * T - 0.000014 * T * T) * sin(M) +
+        (0.019993 - 0.000101 * T) * sin(2 * M) +
+        0.000289 * sin(3 * M);
+      const trueLong = L0 + C;
+      const v = M + C;
+      const R = 1.000001018 * (1 - e * e) / (1 + e * cos(v));
+      const omega = 125.04 - 1934.136 * T;
+      const lon = mod360(trueLong - 0.00569 - 0.00478 * sin(omega));
+      const eps = meanObliquity(T) + 0.00256 * cos(omega);
+      const eq = eclToEq(lon, 0, eps);
+      return {
+        lon, lat: 0, ra: eq.ra, dec: eq.dec, distKM: R * AU_KM,
+        R, T, L0, M, obl: eps
+      };
+    }
+
+    // Meeus lunar periodic terms, truncated 60 terms.
+    const LR = [
+      [0,0,1,0,6288774,-20905355],[2,0,-1,0,1274027,-3699111],[2,0,0,0,658314,-2955968],
+      [0,0,2,0,213618,-569925],[0,1,0,0,-185116,48888],[0,0,0,2,-114332,-3149],
+      [2,0,-2,0,58793,246158],[2,-1,-1,0,57066,-152138],[2,0,1,0,53322,-170733],
+      [2,-1,0,0,45758,-204586],[0,1,-1,0,-40923,-129620],[1,0,0,0,-34720,108743],
+      [0,1,1,0,-30383,104755],[2,0,0,-2,15327,10321],[0,0,1,2,-12528,0],
+      [0,0,1,-2,10980,79661],[4,0,-1,0,10675,-34782],[0,0,3,0,10034,-23210],
+      [4,0,-2,0,8548,-21636],[2,1,-1,0,-7888,24208],[2,1,0,0,-6766,30824],
+      [1,0,-1,0,-5163,-8379],[1,1,0,0,4987,-16675],[2,-1,1,0,4036,-12831],
+      [2,0,2,0,3994,-10445],[4,0,0,0,3861,-11650],[2,0,-3,0,3665,14403],
+      [0,1,-2,0,-2689,-7003],[2,0,-1,2,-2602,0],[2,-1,-2,0,2390,10056],
+      [1,0,1,0,-2348,6322],[2,-2,0,0,2236,-9884],[0,1,2,0,-2120,5751],
+      [0,2,0,0,-2069,0],[2,-2,-1,0,2048,-4950],[2,0,1,-2,-1773,4130],
+      [2,0,0,2,-1595,0],[4,-1,-1,0,1215,-3958],[0,0,2,2,-1110,0],
+      [3,0,-1,0,-892,3258],[2,1,1,0,-810,2616],[4,-1,-2,0,759,-1897],
+      [0,2,-1,0,-713,-2117],[2,2,-1,0,-700,2354],[2,1,-2,0,691,0],
+      [2,-1,0,-2,596,0],[4,0,1,0,549,-1423],[0,0,4,0,537,-1117],
+      [4,-1,0,0,520,-1571],[1,0,-2,0,-487,-1739],[2,1,0,-2,-399,0],
+      [0,0,2,-2,-381,-4421],[1,1,1,0,351,0],[3,0,-2,0,-340,0],
+      [4,0,-3,0,330,0],[2,-1,2,0,327,0],[0,2,1,0,-323,1165],
+      [1,1,-1,0,299,0],[2,0,3,0,294,0],[2,0,-1,-2,0,8752]
+    ];
+
+    const B = [
+      [0,0,0,1,5128122],[0,0,1,1,280602],[0,0,1,-1,277693],[2,0,0,-1,173237],
+      [2,0,-1,1,55413],[2,0,-1,-1,46271],[2,0,0,1,32573],[0,0,2,1,17198],
+      [2,0,1,-1,9266],[0,0,2,-1,8822],[2,-1,0,-1,8216],[2,0,-2,-1,4324],
+      [2,0,1,1,4200],[2,1,0,-1,-3359],[2,-1,-1,1,2463],[2,-1,0,1,2211],
+      [2,-1,-1,-1,2065],[0,1,-1,-1,-1870],[4,0,-1,-1,1828],[0,1,0,1,-1794],
+      [0,0,0,3,-1749],[0,1,-1,1,-1565],[1,0,0,1,-1491],[0,1,1,1,-1475],
+      [0,1,1,-1,-1410],[0,1,0,-1,-1344],[1,0,0,-1,-1335],[0,0,3,1,1107],
+      [4,0,0,-1,1021],[4,0,-1,1,833],[0,0,1,-3,777],[4,0,-2,1,671],
+      [2,0,0,-3,607],[2,0,2,-1,596],[2,-1,1,-1,491],[2,0,-2,1,-451],
+      [0,0,3,-1,439],[2,0,2,1,422],[2,0,-3,-1,421],[2,1,-1,1,-366],
+      [2,1,0,1,-351],[4,0,0,1,331],[2,-1,1,1,315],[2,-2,0,-1,302],
+      [0,0,1,3,-283],[2,1,1,-1,-229],[1,1,0,-1,223],[1,1,0,1,223],
+      [0,1,-2,-1,-220],[2,1,-1,-1,-220],[1,0,1,1,-185],[2,-1,-2,-1,181],
+      [0,1,2,1,-177],[4,0,-2,-1,176],[4,-1,-1,-1,166],[1,0,1,-1,-164],
+      [4,0,1,-1,132],[1,0,-1,-1,-119],[4,-1,0,-1,115],[2,-2,0,1,107]
+    ];
+
+    function moon(jd) {
+      const T = (jdeTT(jd) - 2451545.0) / 36525;
+      const T2 = T * T, T3 = T2 * T, T4 = T3 * T;
+      const Lp = mod360(218.3164477 + 481267.88123421 * T - 0.0015786 * T2 + T3 / 538841 - T4 / 65194000);
+      const D = mod360(297.8501921 + 445267.1114034 * T - 0.0018819 * T2 + T3 / 545868 - T4 / 113065000);
+      const M = mod360(357.5291092 + 35999.0502909 * T - 0.0001536 * T2 + T3 / 24490000);
+      const Mp = mod360(134.9633964 + 477198.8675055 * T + 0.0087414 * T2 + T3 / 69699 - T4 / 14712000);
+      const F = mod360(93.2720950 + 483202.0175233 * T - 0.0036539 * T2 - T3 / 3526000 + T4 / 863310000);
+      const E = 1 - 0.002516 * T - 0.0000074 * T2;
+
+      let sumL = 0, sumR = 0, sumB = 0;
+      for (const r of LR) {
+        const [d, m, mp, f, l, rr] = r;
+        const ef = Math.abs(m) === 1 ? E : Math.abs(m) === 2 ? E * E : 1;
+        const arg = d * D + m * M + mp * Mp + f * F;
+        sumL += ef * l * sin(arg);
+        sumR += ef * rr * cos(arg);
+      }
+      for (const r of B) {
+        const [d, m, mp, f, b] = r;
+        const ef = Math.abs(m) === 1 ? E : Math.abs(m) === 2 ? E * E : 1;
+        const arg = d * D + m * M + mp * Mp + f * F;
+        sumB += ef * b * sin(arg);
+      }
+
+      const lon = mod360(Lp + sumL / 1e6);
+      const lat = sumB / 1e6;
+      const distKM = 385000.56 + sumR / 1000;
+      const eq = eclToEq(lon, lat, meanObliquity(T));
+      return { lon, lat, ra: eq.ra, dec: eq.dec, distKM, T, D, M, Mp, F };
+    }
+
+    function gmst(jd) {
+      const T = (jd - 2451545.0) / 36525;
+      return mod360(280.46061837 + 360.98564736629 * (jd - 2451545.0) +
+                    0.000387933 * T * T - T ** 3 / 38710000);
+    }
+
+    function rho(lat, h) {
+      const u = Math.atan(0.99664719 * Math.tan(lat * D2R)) * R2D;
+      const hm = (h || 0) / 6378140;
+      return {
+        rs: 0.99664719 * sin(u) + hm * sin(lat),
+        rc: cos(u) + hm * cos(lat)
+      };
+    }
+
+    function refractionBennett(alt) {
+      if (!Number.isFinite(alt) || alt &lt; -1) return 0;
+      return (1.02 / tan(alt + 10.3 / (alt + 5.11))) / 60;
+    }
+
+    function horiz(body, jd, lat, lon, h = 0, applyRef = true) {
+      const H = norm180(gmst(jd) + lon - body.ra); // lon east positive
+      const hp = asin(ER_KM / body.distKM);
+      const rr = rho(lat, h);
+
+      const da = atan2(
+        -rr.rc * sin(hp) * sin(H),
+        cos(body.dec) - rr.rc * sin(hp) * cos(H)
+      );
+
+      const decP = atan2(
+        (sin(body.dec) - rr.rs * sin(hp)) * cos(da),
+        cos(body.dec) - rr.rc * sin(hp) * cos(H)
+      );
+
+      const HP = H - da;
+      const altGeo = asin(sin(lat) * sin(decP) + cos(lat) * cos(decP) * cos(HP));
+      const az = mod360(atan2(sin(HP), cos(HP) * sin(lat) - tan(decP) * cos(lat)) + 180);
+      const ref = applyRef ? refractionBennett(altGeo) : 0;
+      return { altGeo, altApp: altGeo + ref, az, ra: body.ra + da, dec: decP, hp, ref };
+    }
+
+    function elongation(jd) {
+      return norm180(moon(jd).lon - sun(jd).lon);
+    }
+
+    function oldHijriGuessJD(thnH, bAkhir) {
+      const HY = thnH + (bAkhir * 29.53) / 354.3671;
+      const K = Math.round((HY - 1410) * 12);
+      const T = K / 1200;
+      // Hanya titik awal pencarian; bukan hasil final.
+      return 2447740.652 + 29.53058868 * K + 0.0001178 * T * T;
+    }
+
+    function findConjunctionNear(jdGuess) {
+      const start = jdGuess - 2, end = jdGuess + 2, step = 1 / 24;
+      let last = start, eLast = elongation(last), lo = null, hi = null;
+
+      for (let t = start + step; t &lt;= end; t += step) {
+        const e = elongation(t);
+        if (Math.abs(e - eLast) &lt; 180 &amp;&amp; ((eLast &lt;= 0 &amp;&amp; e &gt;= 0) || (eLast &gt;= 0 &amp;&amp; e &lt;= 0))) {
+          lo = last; hi = t; break;
+        }
+        last = t; eLast = e;
+      }
+
+      if (lo === null) {
+        let best = start, bestVal = Infinity;
+        for (let t = start; t &lt;= end; t += step) {
+          const v = Math.abs(elongation(t));
+          if (v &lt; bestVal) { bestVal = v; best = t; }
+        }
+        lo = best - step; hi = best + step;
+      }
+
+      let eLo = elongation(lo);
+      for (let i = 0; i &lt; 80; i++) {
+        const mid = (lo + hi) / 2;
+        const eMid = elongation(mid);
+        if (Math.abs(eMid) &lt; 1e-10) return mid;
+        if ((eLo &lt;= 0 &amp;&amp; eMid &gt;= 0) || (eLo &gt;= 0 &amp;&amp; eMid &lt;= 0)) {
+          hi = mid;
+        } else {
+          lo = mid; eLo = eMid;
+        }
+      }
+      return (lo + hi) / 2;
+    }
+
+    function findConjunctionHijri(thnH, bAkhir) {
+      return findConjunctionNear(oldHijriGuessJD(thnH, bAkhir));
+    }
+
+    function sunAltGeom(jd, lat, lon, h) {
+      return horiz(sun(jd), jd, lat, lon, h, false).altGeo;
+    }
+
+    function findSunsetLocal(y, m, d, tz, lat, lon, h = 0) {
+      const dip = (1.76 / 60) * Math.sqrt(Math.max(0, h || 0));
+      const target = -0.833 - dip; // geometric solar center altitude
+      const start = jdUTC(y, m, d, 12, 0, 0) - tz / 24;
+      const end = jdUTC(y, m, d, 24, 0, 0) - tz / 24;
+      const step = 1 / 48;
+
+      let last = start, fLast = sunAltGeom(last, lat, lon, h) - target;
+      let lo = null, hi = null;
+
+      for (let t = start + step; t &lt;= end; t += step) {
+        const f = sunAltGeom(t, lat, lon, h) - target;
+        if (fLast &gt;= 0 &amp;&amp; f &lt;= 0) {
+          lo = last; hi = t; break;
+        }
+        last = t; fLast = f;
+      }
+
+      if (lo === null) return NaN;
+
+      for (let i = 0; i &lt; 60; i++) {
+        const mid = (lo + hi) / 2;
+        const f = sunAltGeom(mid, lat, lon, h) - target;
+        if (f &gt; 0) lo = mid; else hi = mid;
+      }
+      return (lo + hi) / 2;
+    }
+
+    function hilalAtSunset(jdConj, lat, lon, tz, h = 0) {
+      let c = fromJD(jdConj + tz / 24);
+      let sunsetJD = findSunsetLocal(c.y, c.m, c.d, tz, lat, lon, h);
+
+      // Ijtima harus qablal ghurub. Jika ijtima sesudah sunset, observasi pindah ke sunset hari lokal berikutnya.
+      if (!Number.isFinite(sunsetJD) || jdConj &gt; sunsetJD) {
+        const next = fromJD(jdUTC(c.y, c.m, c.d, 12, 0, 0) + 1);
+        sunsetJD = findSunsetLocal(next.y, next.m, next.d, tz, lat, lon, h);
+      }
+
+      const sp = sun(sunsetJD);
+      const mp = moon(sunsetJD);
+      const sh = horiz(sp, sunsetJD, lat, lon, h, false);
+      const mh = horiz(mp, sunsetJD, lat, lon, h, false);
+      const dip = (1.76 / 60) * Math.sqrt(Math.max(0, h || 0));
+      const sdc = 0.2725 * mh.hp; // lunar semidiameter approx in degree
+
+      const hcTengah = mh.altGeo + refractionBennett(mh.altGeo) + dip;
+      const hcAtas = hcTengah + sdc;
+      const hcBawah = hcTengah - sdc;
+
+      const EL = acos(sin(sp.dec) * sin(mp.dec) + cos(sp.dec) * cos(mp.dec) * cos(sp.ra - mp.ra));
+      const umur = (sunsetJD - jdConj) * 24;
+      const ms = hcTengah &gt; 0 ? sunsetJD + (hcTengah / 15) / 24 : sunsetJD;
+      const z = norm180(mh.az - sh.az);
+
+      return {
+        sunsetJD, sun: sp, moon: mp, sunHor: sh, moonHor: mh, dip, sdc,
+        hc: mh.altGeo, hcTengah, hcAtas, hcBawah,
+        Azm: sh.az, Azc: mh.az, z, EL, umur,
+        FI: hcTengah &lt; 0 ? 0 : ((1 - cos(EL)) / 2) * 100,
+        Cw: (1 - cos(EL)) * sdc * 60,
+        Ms: ms,
+        Mukts: hcTengah &gt; 0 ? (ms - sunsetJD) * 24 : 0,
+        Miring: Math.abs(hcTengah) &lt; 1e-8 ? 0 : atan2(z, hcTengah)
+      };
+    }
+
+    return {
+      jdUTC, fromJD, utcToLocal: (jd, tz) =&gt; fromJD(jd + tz / 24),
+      sun, moon, horiz, refractionBennett, deltaTSeconds,
+      findConjunctionHijri, findSunsetLocal, hilalAtSunset,
+      mod360, norm180
+    };
+  })();
+
+  window.FalakEngine = FE;
+
+  // =========================
+  // UI COMPAT HELPERS
+  // =========================
+  const HARI2 = [&#x27;Ahad&#x27;,&#x27;Senin&#x27;,&#x27;Selasa&#x27;,&#x27;Rabu&#x27;,&#x27;Kamis&#x27;,&quot;Jum&#x27;at&quot;,&#x27;Sabtu&#x27;];
+  const PASARAN2 = [&#x27;Legi&#x27;,&#x27;Pahing&#x27;,&#x27;Pon&#x27;,&#x27;Wage&#x27;,&#x27;Kliwon&#x27;];
+
+  function pad2(n){ return String(Math.floor(Math.abs(n))).padStart(2, &#x27;0&#x27;); }
+
+  function fmtJamFromJD(jd, tz) {
+    const c = FE.utcToLocal(jd, tz);
+    let s = Math.round(c.s);
+    let mi = c.mi, h = c.h;
+    if (s &gt;= 60) { s -= 60; mi += 1; }
+    if (mi &gt;= 60) { mi -= 60; h += 1; }
+    h = ((h % 24) + 24) % 24;
+    return `${pad2(h)}:${pad2(mi)}:${pad2(s)}`;
+  }
+
+  function dayNameFromGregorian(y, m, d) {
+    const jd0 = FE.jdUTC(y, m, d, 0, 0, 0);
+    const idx = ((Math.floor(jd0 + 1.5) % 7) + 7) % 7; // 0 Ahad
+    return HARI2[idx];
+  }
+
+  function pasaranFromGregorian(y, m, d) {
+    const jd0 = Math.floor(FE.jdUTC(y, m, d, 0, 0, 0) + 0.5);
+    return PASARAN2[((jd0 + 1) % 5 + 5) % 5];
+  }
+
+  function dateStr(c) {
+    return `${c.d} ${NAMA_BULAN_M[c.m]} ${c.y}`;
+  }
+
+  // Override converter lama: JD tetap UTC, tz hanya untuk display lokal.
+  window.jdToMasehi = function(jd) {
+    const c = FE.fromJD(jd);
+    return { y: c.y, m: c.m, d: c.d, h: c.h + c.mi / 60 + c.s / 3600 };
+  };
+
+  window.gregorianToJD = function(y, m, d, hLocal, tz) {
+    const hour = Math.floor(hLocal || 0);
+    const minuteFloat = ((hLocal || 0) - hour) * 60;
+    const minute = Math.floor(minuteFloat);
+    const second = (minuteFloat - minute) * 60;
+    const jd = FE.jdUTC(y, m, d, hour, minute, second) - (tz || 0) / 24;
+
+    let TYDH = m &lt; 3 ? y - 1 : y;
+    let BYDH = m &lt; 3 ? m + 12 : m;
+    let A = Math.floor(TYDH / 100);
+    let B = 2 - A + Math.floor(A / 4);
+    return { A, B, BYDH, TYDH, JD: jd, T: (jd - 2451545) / 36525 };
+  };
+
+  window.konversi = function(jd, tz) {
+    const c = FE.utcToLocal(jd, tz);
+    const jdLocalMid = FE.jdUTC(c.y, c.m, c.d, 0, 0, 0);
+    const dow = ((Math.floor(jdLocalMid + 1.5) % 7) + 7) % 7;
+    const ps = ((Math.floor(jdLocalMid + 0.5) + 1) % 5 + 5) % 5;
+    const Z = Math.floor(jd + 0.5);
+    return {
+      Z, AA: &#x27;—&#x27;, A: &#x27;—&#x27;, B: &#x27;—&#x27;, C: &#x27;—&#x27;, D: &#x27;—&#x27;, E: &#x27;—&#x27;,
+      Tgl: c.d, Bln: c.m, Thn: c.y,
+      WI: ((jd + 0.5) % 1) * 24,
+      WD: c.h + c.mi / 60 + c.s / 3600,
+      Hr: dow, Ps: ps,
+      hari: HARI2[dow], pasaran: PASARAN2[ps],
+      tglF: c.d, blnF: c.m, thnF: c.y,
+      wdF: c.h + c.mi / 60 + c.s / 3600
+    };
+  };
+
+  // Compat calcSun/calcMoon jika masih dipanggil bagian lain.
+  window.calcSun = function(jd, T, lat, lon, tz, tt) {
+    const s = FE.sun(jd);
+    const h = FE.horiz(s, jd, lat, lon, tt || 0, false);
+    return {
+      Dip: (1.76 / 60) * Math.sqrt(Math.max(0, tt || 0)),
+      S: s.L0, m: s.M, N: 0, Kp: 0, Kpp: 0, Rp: 0, Rpp: 0,
+      Qp: s.obl, E: FE.norm180(s.lon - s.L0), Sp: s.lon,
+      delta: s.dec, Pta: s.ra, PT: s.ra, e: 0,
+      sdm: 0.2666 / s.R, h: -0.833, t: 0,
+      Azm: h.az, GrLMT: 0, GrWD: FE.utcToLocal(jd, tz).h + FE.utcToLocal(jd, tz).mi / 60,
+      Ra: s.R, R: s.distKM
+    };
+  };
+
+  window.calcMoon = function(jd, T, sunObj, lat, lon, tt) {
+    const m = FE.moon(jd);
+    const h = FE.horiz(m, jd, lat, lon, tt || 0, false);
+    return {
+      M: m.lon, A: m.Mp, F: m.F, D: m.D,
+      T1: 0,T2:0,T3:0,T4:0,T5:0,T6:0,T7:0,T8:0,T9:0,T10:0,T11:0,T12:0,T13:0,T14:0,C:0,
+      Mo: m.lon, Ap: m.Mp, Lp: m.lat, x: 0, y: 0, deltac: m.dec, Ptca: m.ra, PTc: m.ra,
+      tc: 0, hc: h.altGeo, p: m.distKM, HP: h.hp, sdc: 0.2725 * h.hp,
+      P: h.hp * Math.cos(h.altGeo * Math.PI / 180), Ref: FE.refractionBennett(h.altGeo),
+      hca: h.altGeo - h.hp * Math.cos(h.altGeo * Math.PI / 180),
+      hcAtas: h.altApp + 0.2725 * h.hp, hcTengah: h.altApp, hcBawah: h.altApp - 0.2725 * h.hp,
+      Azc: h.az, z: 0, Dc: 0, AL: 0, Cw: 0, EL: 0, FIa: 0, FI: 0, Ms: 0, Mukts: 0, Miring: 0, umur: 0
+    };
+  };
+
+  // =========================
+  // PATCH HISAB AWAL BULAN
+  // =========================
+  window.hitungHisab = function() {
+    try {
+      const err = document.getElementById(&#x27;h_error&#x27;);
+      err.style.display = &#x27;none&#x27;;
+
+      const tz = +document.getElementById(&#x27;h_tz&#x27;).value;
+      const tt = +document.getElementById(&#x27;h_tt&#x27;).value || 0;
+      const bAkhir = +document.getElementById(&#x27;h_bulanAkhir&#x27;).value;
+      const bAwal = +document.getElementById(&#x27;h_bulanAwal&#x27;).value;
+      const thnH = +document.getElementById(&#x27;h_tahunH&#x27;).value;
+      const lon = coordToDec(
+        document.getElementById(&#x27;h_lon_d&#x27;).value,
+        document.getElementById(&#x27;h_lon_m&#x27;).value,
+        document.getElementById(&#x27;h_lon_s&#x27;).value,
+        document.getElementById(&#x27;h_lon_dir&#x27;).value
+      );
+      const lat = coordToDec(
+        document.getElementById(&#x27;h_lat_d&#x27;).value,
+        document.getElementById(&#x27;h_lat_m&#x27;).value,
+        document.getElementById(&#x27;h_lat_s&#x27;).value,
+        document.getElementById(&#x27;h_lat_dir&#x27;).value
+      );
+
+      const JD_Ijt = FE.findConjunctionHijri(thnH, bAkhir);
+      const cIjtUTC = FE.fromJD(JD_Ijt);
+      const cIjtLoc = FE.utcToLocal(JD_Ijt, tz);
+      const sunI = FE.sun(JD_Ijt);
+      const moonI = FE.moon(JD_Ijt);
+      const elongI = FE.norm180(moonI.lon - sunI.lon);
+      const konv = konversi(JD_Ijt, tz);
+
+      document.getElementById(&#x27;tbl_h_ijtima&#x27;).innerHTML = [
+        tRow(&#x27;JD UTC&#x27;,&#x27;Hasil akar λ Bulan - λ Matahari = 0&#x27;, fmtNum(JD_Ijt, 9), &#x27;—&#x27;),
+        tRow(&#x27;UTC&#x27;, &#x27;Timestamp ijtimak berbasis UTC&#x27;, `${dateStr(cIjtUTC)} ${fmtJamFromJD(JD_Ijt, 0)} UTC`, &#x27;—&#x27;),
+        tRow(&#x27;WD&#x27;, &#x27;UTC dikonversi ke zona waktu tempat&#x27;, `${dateStr(cIjtLoc)} ${fmtJamFromJD(JD_Ijt, tz)} ${tzName(tz)}`, &#x27;—&#x27;),
+        tRow(&#x27;λ☉&#x27;,&#x27;Longitude geosentris apparent Matahari&#x27;, fmtNum(sunI.lon, 8), fmtDMS(sunI.lon)),
+        tRow(&#x27;λ☾&#x27;,&#x27;Longitude geosentris Bulan&#x27;, fmtNum(moonI.lon, 8), fmtDMS(moonI.lon)),
+        tRow(&#x27;Δλ&#x27;,&#x27;Normalize(λ☾ - λ☉)&#x27;, fmtNum(elongI, 10), fmtDMS(elongI)),
+        tRow(&#x27;ΔT&#x27;,&#x27;TT - UTC estimasi&#x27;, fmtNum(FE.deltaTSeconds(JD_Ijt), 3) + &#x27; detik&#x27;, &#x27;—&#x27;)
+      ].join(&#x27;&#x27;);
+
+      document.getElementById(&#x27;tbl_h_konversi&#x27;).innerHTML = [
+        tRow2(&#x27;JD&#x27;, &#x27;Julian Day UTC&#x27;, fmtNum(JD_Ijt, 9)),
+        tRow2(&#x27;Tanggal UTC&#x27;, &#x27;fromJulianDay(JD)&#x27;, `${dateStr(cIjtUTC)} ${fmtJamFromJD(JD_Ijt, 0)} UTC`),
+        tRow2(&#x27;Tanggal Lokal&#x27;, &#x27;utcToLocal(JD, TZ)&#x27;, `${konv.hari} ${konv.pasaran}, ${dateStr(cIjtLoc)} ${fmtJamFromJD(JD_Ijt, tz)} ${tzName(tz)}`),
+        tRow2(&#x27;Hr&#x27;, &#x27;Hari lokal&#x27;, konv.hari),
+        tRow2(&#x27;Ps&#x27;, &#x27;Pasaran lokal&#x27;, konv.pasaran)
+      ].join(&#x27;&#x27;);
+
+      const hilal = FE.hilalAtSunset(JD_Ijt, lat, lon, tz, tt);
+      if (!Number.isFinite(hilal.sunsetJD)) throw new Error(&#x27;Sunset/ghurub tidak ditemukan untuk tanggal dan lokasi ini.&#x27;);
+
+      const cSunsetLoc = FE.utcToLocal(hilal.sunsetJD, tz);
+      const jdFinal = {
+        JD: hilal.sunsetJD,
+        T: (hilal.sunsetJD - 2451545) / 36525,
+        A: &#x27;—&#x27;, B: &#x27;—&#x27;, BYDH: cSunsetLoc.m, TYDH: cSunsetLoc.y
+      };
+
+      document.getElementById(&#x27;tbl_h_jd&#x27;).innerHTML = [
+        tRow2(&#x27;JD Ghurub&#x27;, &#x27;Julian Day UTC saat solar altitude = -0.833° - Dip&#x27;, fmtNum(hilal.sunsetJD, 9)),
+        tRow2(&#x27;T Ghurub&#x27;, &#x27;(JD - 2451545) / 36525&#x27;, fmtNum(jdFinal.T, 10)),
+        tRow2(&#x27;Dip&#x27;, &#x27;1.76/60 × √TT&#x27;, `${fmtNum(hilal.dip, 8)} | &lt;span style=&quot;color:var(--gold); font-family:var(--mono);&quot;&gt;${fmtDMS(hilal.dip)}&lt;/span&gt;`),
+        tRow2(&#x27;Waktu Ghurub&#x27;, &#x27;UTC → lokal&#x27;, `${dateStr(cSunsetLoc)} ${fmtJamFromJD(hilal.sunsetJD, tz)} ${tzName(tz)}`)
+      ].join(&#x27;&#x27;);
+
+      document.getElementById(&#x27;tbl_h_matahari&#x27;).innerHTML = [
+        tRow(&#x27;λ☉&#x27;,&#x27;Longitude apparent Matahari&#x27;, fmtNum(hilal.sun.lon, 8), fmtDMS(hilal.sun.lon)),
+        tRow(&#x27;α☉&#x27;,&#x27;Right Ascension Matahari&#x27;, fmtNum(hilal.sun.ra, 8), fmtDMS(hilal.sun.ra)),
+        tRow(&#x27;δ☉&#x27;,&#x27;Declination Matahari&#x27;, fmtNum(hilal.sun.dec, 8), fmtDMS(hilal.sun.dec)),
+        tRow(&#x27;R☉&#x27;,&#x27;Jarak Matahari&#x27;, fmtNum(hilal.sun.distKM, 2) + &#x27; KM&#x27;, &#x27;—&#x27;),
+        tRow(&#x27;Alt☉&#x27;,&#x27;Altitude geometris pusat Matahari saat ghurub&#x27;, fmtNum(hilal.sunHor.altGeo, 8), fmtDMS(hilal.sunHor.altGeo)),
+        tRow(&#x27;Azm&#x27;,&#x27;Azimuth Matahari toposentrik&#x27;, fmtNum(hilal.Azm, 8), fmtDMS(hilal.Azm)),
+        tRow(&#x27;Gr WD&#x27;,&#x27;Waktu ghurub lokal&#x27;, fmtJamFromJD(hilal.sunsetJD, tz), fmtJamFromJD(hilal.sunsetJD, tz))
+      ].join(&#x27;&#x27;);
+
+      document.getElementById(&#x27;tbl_h_bulan&#x27;).innerHTML = [
+        tRow(&#x27;λ☾&#x27;,&#x27;Longitude geosentris Bulan&#x27;, fmtNum(hilal.moon.lon, 8), fmtDMS(hilal.moon.lon)),
+        tRow(&#x27;β☾&#x27;,&#x27;Latitude ekliptika Bulan&#x27;, fmtNum(hilal.moon.lat, 8), fmtDMS(hilal.moon.lat)),
+        tRow(&#x27;α☾&#x27;,&#x27;Right Ascension Bulan&#x27;, fmtNum(hilal.moon.ra, 8), fmtDMS(hilal.moon.ra)),
+        tRow(&#x27;δ☾&#x27;,&#x27;Declination Bulan&#x27;, fmtNum(hilal.moon.dec, 8), fmtDMS(hilal.moon.dec)),
+        tRow(&#x27;p&#x27;,&#x27;Jarak Bulan&#x27;, fmtNum(hilal.moon.distKM, 2) + &#x27; KM&#x27;, &#x27;—&#x27;),
+        tRow(&#x27;HP&#x27;,&#x27;Horizontal Parallax Bulan&#x27;, fmtNum(hilal.moonHor.hp, 8), fmtDMS(hilal.moonHor.hp)),
+        tRow(&#x27;s.d.c&#x27;,&#x27;Semidiameter Bulan&#x27;, fmtNum(hilal.sdc, 8), fmtDMS(hilal.sdc)),
+        tRow(&#x27;Ref&#x27;,&#x27;Refraksi Bennett pada tinggi Bulan&#x27;, fmtNum(hilal.moonHor.ref, 8), fmtDMS(hilal.moonHor.ref)),
+        tRow(&#x27;hc&#x27;,&#x27;Tinggi toposentrik geometris pusat Bulan&#x27;, fmtNum(hilal.hc, 8), fmtDMS(hilal.hc)),
+        tRow(&quot;hc&#x27; [piringan atas]&quot;,&#x27;hc + Ref + Dip + sdc&#x27;, fmtNum(hilal.hcAtas, 8), fmtDMS(hilal.hcAtas)),
+        tRow(&quot;hc&#x27; [piringan tengah]&quot;,&#x27;hc + Ref + Dip&#x27;, fmtNum(hilal.hcTengah, 8), fmtDMS(hilal.hcTengah)),
+        tRow(&quot;hc&#x27; [piringan bawah]&quot;,&#x27;hc + Ref + Dip - sdc&#x27;, fmtNum(hilal.hcBawah, 8), fmtDMS(hilal.hcBawah)),
+        tRow(&#x27;Umur&#x27;,&#x27;(JD Ghurub - JD Ijtimak) × 24&#x27;, fmtNum(hilal.umur, 8), fmtJam(hilal.umur)),
+        tRow(&#x27;Azm&#x27;,&#x27;Azimuth Matahari toposentrik&#x27;, fmtNum(hilal.Azm, 8), fmtDMS(hilal.Azm)),
+        tRow(&#x27;Azc&#x27;,&#x27;Azimuth Bulan toposentrik&#x27;, fmtNum(hilal.Azc, 8), fmtDMS(hilal.Azc)),
+        tRow(&#x27;z&#x27;,&#x27;Normalize(Azc - Azm)&#x27;, fmtNum(hilal.z, 8), fmtDMS(hilal.z)),
+        tRow(&#x27;EL&#x27;,&#x27;Elongasi geosentris Bulan-Matahari&#x27;, fmtNum(hilal.EL, 8), fmtDMS(hilal.EL)),
+        tRow(&#x27;FI&#x27;,&#x27;Illuminated fraction aproksimasi&#x27;, fmtNum(hilal.FI, 5) + &#x27; %&#x27;, &#x27;—&#x27;),
+        tRow(&#x27;Cw&#x27;,&#x27;Lebar sabit aproksimasi&#x27;, fmtNum(hilal.Cw, 6) + &#x27; mt&#x27;, &#x27;—&#x27;),
+        tRow(&#x27;Ms&#x27;,&#x27;Hilal terbenam aproksimasi&#x27;, fmtJamFromJD(hilal.Ms, tz), fmtJamFromJD(hilal.Ms, tz)),
+        tRow(&#x27;Mukts&#x27;,&#x27;Lama hilal di atas ufuk&#x27;, fmtNum(hilal.Mukts, 8), fmtJam(hilal.Mukts)),
+        tRow(&#x27;Miring&#x27;,&#x27;atan2(z, hc\&#x27;)&#x27;, fmtNum(hilal.Miring, 8), fmtDMS(hilal.Miring))
+      ].join(&#x27;&#x27;);
+
+      // Print result
+      document.getElementById(&#x27;p_ijt_hari&#x27;).textContent = konv.hari;
+      document.getElementById(&#x27;p_ijt_tgl&#x27;).textContent = dateStr(cIjtLoc);
+      document.getElementById(&#x27;p_ijt_jam&#x27;).textContent = fmtJamFromJD(JD_Ijt, tz);
+      document.querySelectorAll(&#x27;.p_tz&#x27;).forEach(e =&gt; e.textContent = tzName(tz));
+
+      document.getElementById(&#x27;p_g_hari&#x27;).textContent = dayNameFromGregorian(cSunsetLoc.y, cSunsetLoc.m, cSunsetLoc.d);
+      document.getElementById(&#x27;p_g_tgl&#x27;).textContent = cSunsetLoc.d;
+      document.getElementById(&#x27;p_g_bln&#x27;).textContent = NAMA_BULAN_M[cSunsetLoc.m];
+      document.getElementById(&#x27;p_g_thn&#x27;).textContent = cSunsetLoc.y;
+      document.getElementById(&#x27;p_maghrib&#x27;).textContent = fmtJamFromJD(hilal.sunsetJD, tz);
+      document.getElementById(&#x27;p_azm&#x27;).textContent = fmtDMS(hilal.Azm);
+      document.getElementById(&#x27;p_azc&#x27;).textContent = fmtDMS(hilal.Azc);
+      document.getElementById(&#x27;p_z&#x27;).textContent = fmtDMS(hilal.z);
+      document.getElementById(&#x27;p_hc&#x27;).textContent = fmtDMS(hilal.hc);
+      document.getElementById(&#x27;p_hcp&#x27;).textContent = fmtDMS(hilal.hcTengah);
+      document.getElementById(&#x27;p_umur&#x27;).textContent = fmtJam(hilal.umur);
+      document.getElementById(&#x27;p_el&#x27;).textContent = fmtDMS(hilal.EL);
+      document.getElementById(&#x27;p_fi&#x27;).textContent = fmtNum(hilal.FI, 2) + &#x27;%&#x27;;
+      document.getElementById(&#x27;p_cw&#x27;).textContent = fmtNum(hilal.Cw, 2);
+      document.getElementById(&#x27;p_mukts&#x27;).textContent = fmtJam(hilal.Mukts);
+      document.getElementById(&#x27;p_ms&#x27;).textContent = fmtJamFromJD(hilal.Ms, tz);
+      document.getElementById(&#x27;p_miring&#x27;).textContent = fmtDMS(hilal.Miring);
+
+      const kriteria = document.getElementById(&#x27;h_kriteria&#x27;).value;
+      const ijtimaQablalGhurub = JD_Ijt &lt; hilal.sunsetJD;
+      let hilalTerlihat = false;
+      if (kriteria === &#x27;mabims&#x27;) hilalTerlihat = ijtimaQablalGhurub &amp;&amp; hilal.hcTengah &gt;= 3 &amp;&amp; hilal.EL &gt;= 6.4;
+      else if (kriteria === &#x27;wujudul&#x27;) hilalTerlihat = ijtimaQablalGhurub &amp;&amp; hilal.hcTengah &gt; 0;
+      else if (kriteria === &#x27;danjon&#x27;) hilalTerlihat = ijtimaQablalGhurub &amp;&amp; hilal.EL &gt;= 7;
+
+      const addDays = hilalTerlihat ? 1 : 2;
+      const awal = FE.fromJD(FE.jdUTC(cSunsetLoc.y, cSunsetLoc.m, cSunsetLoc.d, 12, 0, 0) + addDays);
+      document.getElementById(&#x27;p_k_awalbulan&#x27;).textContent = NAMA_BULAN_H[bAwal - 1];
+      document.getElementById(&#x27;p_k_hari&#x27;).textContent = dayNameFromGregorian(awal.y, awal.m, awal.d);
+      document.getElementById(&#x27;p_k_tgl&#x27;).textContent = `${awal.d} ${NAMA_BULAN_M[awal.m]} ${awal.y}`;
+      document.getElementById(&#x27;p_k_status&#x27;).textContent = hilalTerlihat ? &#x27;Hilal Memenuhi Kriteria&#x27; : &#x27;Hilal Belum Memenuhi Kriteria (Istikmal)&#x27;;
+      document.getElementById(&#x27;p_k_status&#x27;).style.color = hilalTerlihat ? &#x27;green&#x27; : &#x27;red&#x27;;
+
+      document.getElementById(&#x27;h_result&#x27;).classList.add(&#x27;visible&#x27;);
+      openSubTab(&#x27;h&#x27;, &#x27;t1&#x27;);
+    } catch (e) {
+      const err = document.getElementById(&#x27;h_error&#x27;);
+      err.style.display = &#x27;block&#x27;;
+      err.textContent = &#x27;Error: &#x27; + e.message;
+    }
+  };
+
+  // =========================
+  // PATCH GERHANA BULAN: UTC BASE, TZ DISPLAY ONLY
+  // =========================
+  window.hitungGerhana = function() {
+    try {
+      const err = document.getElementById(&#x27;g_error&#x27;);
+      err.style.display = &#x27;none&#x27;;
+
+      const tz = +document.getElementById(&#x27;g_tz&#x27;).value;
+      const mode = document.getElementById(&#x27;g_mode&#x27;).value;
+      let targetTxt = &#x27;&#x27;, K = 0;
+
+      if (mode === &#x27;hijri&#x27;) {
+        const bH = +document.getElementById(&#x27;g_bulanH&#x27;).value;
+        const tH = +document.getElementById(&#x27;g_tahunH&#x27;).value;
+        const HY = tH + (bH * 29.53) / 354.3671;
+        K = Math.round((HY - 1410) * 12) - 0.5;
+        targetTxt = `Bulan ${NAMA_BULAN_H[bH-1]} ${tH} H`;
+      } else {
+        const dm = +document.getElementById(&#x27;g_tglM&#x27;).value;
+        const mm = +document.getElementById(&#x27;g_blnM&#x27;).value;
+        const ym = +document.getElementById(&#x27;g_thnM&#x27;).value;
+        const jd = FE.jdUTC(ym, mm, dm, 12, 0, 0) - tz / 24;
+        const rawK = (jd - 2447740.651689) / 29.530588853;
+        K = Math.round(rawK - 0.5) + 0.5;
+        targetTxt = `Tanggal ${dm} ${NAMA_BULAN_M[mm]} ${ym} M`;
+      }
+
+      const T = K / 1200, T2 = T*T, T3 = T2*T;
+      const F = FE.mod360(164.2159288 + 390.67050274*K - 0.0016341*T2 - 0.00000227*T3);
+      const JD = 2447740.651689 + 29.530588853*K + 0.0001337*T2 - 0.00000015*T3;
+      const M = FE.mod360(207.9623868 + 29.10535669*K - 0.0000218*T2);
+      const Mp = FE.mod360(111.1797657 + 385.81693528*K + 0.0107438*T2 + 0.00001239*T3);
+      const Om = FE.mod360(326.4991207 - 1.5637558*K + 0.0020691*T2 + 0.00000215*T3);
+      const F1 = F - 0.02665 * Math.sin(Om * Math.PI / 180);
+      const A1 = 285.9142682 + 0.107408*K - 0.009173*T2;
+      const E = 1 - 0.002516*T - 0.0000074*T2;
+      const sd = x =&gt; Math.sin(x * Math.PI / 180);
+      const cd = x =&gt; Math.cos(x * Math.PI / 180);
+
+      const T1 = -0.4065 * sd(Mp);
+      const T2_ = 0.1727 * E * sd(M);
+      const T3_ = 0.0161 * sd(2*Mp);
+      const T4 = -0.0097 * sd(2*F1);
+      const T5 = 0.0073 * E * sd(Mp-M);
+      const T6 = -0.005 * E * sd(Mp+M);
+      const T7 = -0.0023 * sd(Mp - 2*F1);
+      const T8 = 0.0021 * E * sd(2*M);
+      const T9 = 0.0012 * sd(Mp + 2*F1);
+      const T10 = 0.0006 * E * sd(2*Mp + M);
+      const T11 = -0.0004 * sd(3*Mp);
+      const T12 = -0.0003 * E * sd(M + 2*F1);
+      const T13 = 0.0003 * sd(A1);
+      const T14 = -0.0002 * E * sd(M + 2*F1);
+      const T15 = -0.0002 * E * sd(2*Mp - M);
+      const T16 = -0.0002 * sd(Om);
+      const MT = T1+T2_+T3_+T4+T5+T6+T7+T8+T9+T10+T11+T12+T13+T14+T15+T16;
+
+      // BUG FIX UTAMA:
+      // Lama: JD + 0.5 + MT + tz/24
+      // Benar: JD_EclipseUTC = JD + MT. TZ hanya untuk display lokal.
+      const JD_EclipseUTC = JD + MT;
+      const T0 = (FE.utcToLocal(JD_EclipseUTC, tz).h +
+                  FE.utcToLocal(JD_EclipseUTC, tz).mi / 60 +
+                  FE.utcToLocal(JD_EclipseUTC, tz).s / 3600);
+
+      const konvG = konversi(JD_EclipseUTC, tz);
+
+      document.getElementById(&#x27;tbl_g_dasar&#x27;).innerHTML = [
+        tRow(&#x27;K&#x27;,&#x27;Lunation index full moon&#x27;, K, &#x27;—&#x27;),
+        tRow(&#x27;T&#x27;,&#x27;K/1200&#x27;, fmtNum(T), &#x27;—&#x27;),
+        tRow(&#x27;F&#x27;,&#x27;Argument lintang Bulan&#x27;, fmtNum(F), fmtDMS(F)),
+        tRow(&#x27;JD&#x27;,&#x27;Base JD full moon&#x27;, fmtNum(JD, 9), &#x27;—&#x27;),
+        tRow(&#x27;M&#x27;,&#x27;Anomali Matahari&#x27;, fmtNum(M), fmtDMS(M)),
+        tRow(&quot;M&#x27;&quot;,&#x27;Anomali Bulan&#x27;, fmtNum(Mp), fmtDMS(Mp)),
+        tRow(&#x27;Ω&#x27;,&#x27;Node Bulan&#x27;, fmtNum(Om), fmtDMS(Om)),
+        tRow(&#x27;F1&#x27;,&#x27;F - 0.02665 × Sin Ω&#x27;, fmtNum(F1), fmtDMS(F1)),
+        tRow(&#x27;MT&#x27;,&#x27;Koreksi puncak gerhana/full moon&#x27;, fmtNum(MT), fmtDMS(MT)),
+        tRow(&#x27;JD UTC&#x27;,&#x27;JD + MT&#x27;, fmtNum(JD_EclipseUTC, 9), &#x27;—&#x27;),
+        tRow(&#x27;T0 WD&#x27;,&#x27;Puncak dalam zona waktu lokal&#x27;, fmtNum(T0), fmtJam(T0))
+      ].join(&#x27;&#x27;);
+
+      document.getElementById(&#x27;tbl_g_konversi&#x27;).innerHTML = [
+        tRow2(&#x27;JD UTC&#x27;, &#x27;Julian Day UTC puncak&#x27;, fmtNum(JD_EclipseUTC, 9)),
+        tRow2(&#x27;Tanggal Lokal&#x27;, &#x27;utcToLocal(JD, TZ)&#x27;, `${konvG.hari} ${konvG.pasaran}, ${konvG.tglF} ${NAMA_BULAN_M[konvG.blnF]} ${konvG.thnF} ${fmtJam(T0)} ${tzName(tz)}`),
+        tRow2(&#x27;Hr&#x27;, &#x27;Hari lokal&#x27;, konvG.hari),
+        tRow2(&#x27;Ps&#x27;, &#x27;Pasaran lokal&#x27;, konvG.pasaran)
+      ].join(&#x27;&#x27;);
+
+      const S1 = -0.0048 * E * cd(M);
+      const S2 = 0.002 * E * cd(2*M);
+      const S3 = -0.3299 * cd(Mp);
+      const S4 = -0.006 * E * cd(M+Mp);
+      const S5 = 0.0041 * E * cd(M-Mp);
+      const S = 5.2207 + S1+S2+S3+S4+S5;
+      const C1 = 0.0024 * E * sd(2*M);
+      const C2 = -0.0392 * sd(Mp);
+      const C3 = 0.0116 * sd(2*Mp);
+      const C4 = -0.0073 * E * sd(M+Mp);
+      const C5 = -0.0067 * E * sd(M-Mp);
+      const C6 = 0.0118 * sd(2*F);
+      const Cv = 0.207 * sd(M) + C1+C2+C3+C4+C5+C6;
+      const W = Math.abs(cd(F1));
+      const Y = (S * sd(F1) + Cv * cd(F1)) * (1 - 0.0048 * W);
+      const U1 = 0.0046 * E * cd(M);
+      const U2 = -0.0182 * cd(Mp);
+      const U3 = 0.0004 * cd(2*Mp);
+      const U4 = -0.0005 * cd(M+Mp);
+      const U = 0.00059 + U1+U2+U3+U4;
+      const H = 1.5573 + U, P = 1.0128 - U, R = 0.4678 - U, N = 0.5458 + 0.04 * cd(Mp);
+      const MG = (1.0128 - U - Math.abs(Y)) / 0.545;
+      const status = MG &lt;= 0 ? &#x27;Tidak Gerhana&#x27; : (MG &lt; 1 ? &#x27;Partial (Sebagian)&#x27; : &#x27;Gerhana Total&#x27;);
+
+      const dur = rad =&gt; rad &gt; 0 ? Math.sqrt(rad) / N : NaN;
+      const G_T1 = dur(H*H - Y*Y);
+      const G_T2 = dur(P*P - Y*Y);
+      const G_T3 = dur(R*R - Y*Y);
+
+      const fmtLocalEvent = offsetHour =&gt; {
+        if (!Number.isFinite(offsetHour)) return &#x27;—&#x27;;
+        return fmtJamFromJD(JD_EclipseUTC + offsetHour / 24, tz);
+      };
+
+      const W1 = -G_T1, W2 = -G_T2, W3 = -G_T3, W4 = G_T3, W5 = G_T2, W6 = G_T1;
+
+      document.getElementById(&#x27;tbl_g_waktu&#x27;).innerHTML = [
+        tRow(&#x27;S&#x27;,&#x27;5.2207 + ΣS&#x27;, fmtNum(S), fmtDMS(S)),
+        tRow(&#x27;C&#x27;,&#x27;0.207×sin M + ΣC&#x27;, fmtNum(Cv), fmtDMS(Cv)),
+        tRow(&#x27;W&#x27;,&#x27;|cos(F1)|&#x27;, fmtNum(W), &#x27;—&#x27;),
+        tRow(&#x27;Y&#x27;,&#x27;S×Sin(F1)+C×Cos(F1)×(1-0.0048W)&#x27;, fmtNum(Y), fmtDMS(Y)),
+        tRow(&#x27;U&#x27;,&#x27;0.00059 + ΣU&#x27;, fmtNum(U), fmtDMS(U)),
+        tRow(&#x27;H&#x27;,&#x27;1.5573 + U&#x27;, fmtNum(H), fmtDMS(H)),
+        tRow(&#x27;P&#x27;,&#x27;1.0128 - U&#x27;, fmtNum(P), fmtDMS(P)),
+        tRow(&#x27;R&#x27;,&#x27;0.4678 - U&#x27;, fmtNum(R), fmtDMS(R)),
+        tRow(&#x27;N&#x27;,&quot;0.5458 + 0.04 × Cos(M&#x27;)&quot;, fmtNum(N), fmtDMS(N)),
+        tRow(&#x27;MG&#x27;,&#x27;(1.0128 - U - |Y|) / 0.545&#x27;, fmtNum(MG), &#x27;—&#x27;),
+        tRow(&#x27;Grhna&#x27;,&#x27;Status Gerhana&#x27;, status, &#x27;—&#x27;),
+        tRow(&#x27;T1&#x27;,&#x27;√(H² - Y²) / N&#x27;, fmtNum(G_T1), fmtJam(G_T1)),
+        tRow(&#x27;T2&#x27;,&#x27;√(P² - Y²) / N&#x27;, fmtNum(G_T2), fmtJam(G_T2)),
+        tRow(&#x27;T3&#x27;,&#x27;√(R² - Y²) / N&#x27;, fmtNum(G_T3), fmtJam(G_T3)),
+        tRow(&#x27;W1&#x27;,&#x27;T0 - T1&#x27;, fmtLocalEvent(W1), fmtLocalEvent(W1)),
+        tRow(&#x27;W2&#x27;,&#x27;T0 - T2&#x27;, fmtLocalEvent(W2), fmtLocalEvent(W2)),
+        tRow(&#x27;W3&#x27;,&#x27;T0 - T3&#x27;, fmtLocalEvent(W3), fmtLocalEvent(W3)),
+        tRow(&#x27;T0&#x27;,&#x27;Puncak&#x27;, fmtJamFromJD(JD_EclipseUTC, tz), fmtJamFromJD(JD_EclipseUTC, tz)),
+        tRow(&#x27;W4&#x27;,&#x27;T0 + T3&#x27;, fmtLocalEvent(W4), fmtLocalEvent(W4)),
+        tRow(&#x27;W5&#x27;,&#x27;T0 + T2&#x27;, fmtLocalEvent(W5), fmtLocalEvent(W5)),
+        tRow(&#x27;W6&#x27;,&#x27;T0 + T1&#x27;, fmtLocalEvent(W6), fmtLocalEvent(W6))
+      ].join(&#x27;&#x27;);
+
+      document.getElementById(&#x27;p_g_target&#x27;).textContent = targetTxt;
+      document.getElementById(&#x27;p_g_status&#x27;).textContent = status;
+      document.getElementById(&#x27;p_g_status&#x27;).style.color = status === &#x27;Tidak Gerhana&#x27; ? &#x27;red&#x27; : &#x27;green&#x27;;
+      document.querySelectorAll(&#x27;.p_g_tz&#x27;).forEach(e =&gt; e.textContent = tzName(tz));
+      document.getElementById(&#x27;e_w1&#x27;).textContent = fmtLocalEvent(W1);
+      document.getElementById(&#x27;e_w2&#x27;).textContent = fmtLocalEvent(W2);
+      document.getElementById(&#x27;e_w3&#x27;).textContent = fmtLocalEvent(W3);
+      document.getElementById(&#x27;e_t0&#x27;).textContent = fmtJamFromJD(JD_EclipseUTC, tz);
+      document.getElementById(&#x27;e_w4&#x27;).textContent = fmtLocalEvent(W4);
+      document.getElementById(&#x27;e_w5&#x27;).textContent = fmtLocalEvent(W5);
+      document.getElementById(&#x27;e_w6&#x27;).textContent = fmtLocalEvent(W6);
+
+      document.getElementById(&#x27;g_result&#x27;).classList.add(&#x27;visible&#x27;);
+      openSubTab(&#x27;g&#x27;, &#x27;t1&#x27;);
+    } catch(e) {
+      const err = document.getElementById(&#x27;g_error&#x27;);
+      err.style.display = &#x27;block&#x27;;
+      err.textContent = &#x27;Error: &#x27; + e.message;
+    }
+  };
+
+})();
+
+</script>
+<!-- PATCH FALAK ENGINE - selesai -->
 </body>
 </html>
