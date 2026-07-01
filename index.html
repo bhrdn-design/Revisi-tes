@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator Hisab Falak</title>
+<style>
+:root {
+  --bg: #07111f; --bg2: #0c172a; --surface: #111c31; --surface2: #16233b; --card: #101a2e;
+  --line: #2b4269; --line2: #395780; --text: #eaf2ff; --muted: #9fb0c8; --soft: #c7d6ec;
+  --green: #17c985; --green2: #0ea56e; --blue: #5aa9ff; --gold: #f2b84b; --red: #ff6b6b;
+  --shadow: 0 18px 50px rgba(0,0,0,.32); --radius: 12px;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: linear-gradient(180deg, var(--bg), #050b14); color: var(--text);
+  font-family: var(--sans); font-size: 14px; line-height: 1.5; min-height: 100vh;
+}
+header {
+  padding: 25px 20px 20px; border-bottom: 1px solid var(--line);
+  background: linear-gradient(135deg, rgba(7,17,31,.94), rgba(14,35,61,.94));
+  text-align: center;
+}
+h1 { font-size: clamp(1.4rem, 3vw, 2.2rem); margin: 0 0 5px; color: #fff; }
+h1 span { color: var(--green); }
+.sub { color: var(--muted); font-size: 13px; max-width: 800px; margin: 0 auto; }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 20px 15px 60px; }
+.main-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.main-tab {
+  border: 1px solid var(--line); background: var(--surface); color: var(--muted);
+  border-radius: var(--radius); padding: 15px; font-weight: 800; font-size: 15px;
+  cursor: pointer; transition: 0.3s;
+}
+.main-tab.active {
+  color: #fff; border-color: var(--green);
+  background: linear-gradient(135deg, rgba(23,201,133,.2), rgba(90,169,255,.1));
+  box-shadow: 0 10px 25px rgba(23,201,133,.15);
+}
+.page { display: none; }
+.page.active { display: block; animation: fadeIn 0.4s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.card {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow);
+}
+.title {
+  color: var(--green); font-weight: 900; text-transform: uppercase; font-size: 13px;
+  letter-spacing: 0.1em; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;
+}
+.title:after { content: ""; height: 1px; background: linear-gradient(90deg, var(--line), transparent); flex: 1; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;}
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 15px;}
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 15px;}
+@media(max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } .main-tabs { grid-template-columns: 1fr; } }
+
+label { display: block; color: var(--soft); font-size: 11.5px; text-transform: uppercase; font-weight: 700; margin-bottom: 6px; letter-spacing: 0.05em; }
+input, select {
+  width: 100%; border: 1px solid var(--line2); background: #0b1526; color: #fff;
+  border-radius: 8px; padding: 10px 12px; font-family: var(--mono); font-size: 13.5px;
+  outline: none; transition: 0.2s;
+}
+input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(90,169,255,.15); }
+.coord { display: grid; grid-template-columns: 1fr 1fr 1fr 70px; gap: 5px; }
+
+.btns { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
+.btn {
+  border: 0; border-radius: 8px; padding: 12px 20px; font-weight: 800; cursor: pointer;
+  font-size: 13px; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px;
+}
+.primary { background: linear-gradient(135deg, var(--green), var(--green2)); color: #000; box-shadow: 0 8px 20px rgba(23,201,133,.25); }
+.primary:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(23,201,133,.35); }
+.secondary { background: rgba(255,255,255,.05); color: #fff; border: 1px solid var(--line2); }
+.secondary:hover { background: rgba(255,255,255,.1); }
+
+.gps-status { font-size: 12px; color: var(--gold); margin-top: 8px; font-weight: 600; }
+.error { display: none; background: rgba(255,107,107,.15); color: #ff9797; padding: 12px 15px; border-left: 4px solid var(--red); border-radius: 6px; margin-bottom: 15px; font-weight: 600; }
+
+.result-area { display: none; margin-top: 25px; }
+.result-area.visible { display: block; animation: fadeIn 0.5s ease; }
+.subtabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
+.subtab {
+  background: var(--surface2); color: var(--muted); border: 1px solid var(--line);
+  padding: 8px 15px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer;
+}
+.subtab.active { background: var(--blue); color: #000; border-color: var(--blue); }
+.panel { display: none; }
+.panel.active { display: block; }
+
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: #081224; }
+table { width: 100%; border-collapse: collapse; min-width: 800px; }
+th, td { border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); padding: 8px 10px; font-size: 13px; }
+th { background: var(--surface2); color: var(--soft); text-align: left; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; }
+th:last-child, td:last-child { border-right: 0; }
+tr:last-child td { border-bottom: 0; }
+tr:nth-child(even) td { background: rgba(255,255,255,.015); }
+.kode { font-weight: 900; color: var(--blue); width: 80px; text-align: center; }
+.rumus { color: var(--muted); font-family: var(--mono); font-size: 12px; }
+.num { text-align: right; font-family: var(--mono); color: #fff; }
+.dms { text-align: right; font-family: var(--mono); color: var(--gold); }
+.section-row td { background: rgba(90,169,255,.1) !important; color: var(--blue); font-weight: 800; text-align: center; }
+
+/* Custom Output Formatting for Print-style Results */
+.print-box {
+  background: #fff; color: #000; padding: 30px; border-radius: 8px; font-family: 'Times New Roman', Times, serif;
+  box-shadow: 0 10px 30px rgba(255,255,255,.1); max-width: 800px; margin: 0 auto;
+}
+.print-box h2 { text-align: center; font-size: 18px; font-weight: bold; margin: 0 0 20px; text-transform: uppercase; text-decoration: underline; }
+.print-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; min-width: unset; }
+.print-table td { border: 1px solid #000; padding: 6px 10px; font-size: 15px; background: transparent !important; color: #000 !important; font-family: inherit; }
+.print-table td:nth-child(2) { width: 10px; text-align: center; border-left: none; border-right: none; }
+.print-table td:first-child { font-weight: bold; border-right: none; }
+.print-table td:last-child { border-left: none; }
+.print-header { font-weight: bold; background: #e0e0e0 !important; text-align: center; }
+.kesimpulan-box { margin-top: 20px; font-size: 16px; line-height: 1.6; }
+.kesimpulan-box strong { font-size: 17px; }
+
+/* Special layout for Eclipse conclusion */
+.eclipse-table td { border: 1px solid #000; padding: 6px 10px; font-size: 15px; }
+.eclipse-table td:first-child { font-weight: bold; width: 40%; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Kalkulator Hisab <br /> <span> Irsyadul Murid</span></h1>
+  <p class="sub">Oleh : M.Sholeh Bakhruddin</p>
+</header>
+
+<div class="container">
+  <div class="main-tabs">
+    <button class="main-tab active" onclick="openMainTab('hisab')">🌙 Hisab Ijtima' & Awal Bulan</button>
+    <button class="main-tab" onclick="openMainTab('gerhana')">🌘 Gerhana Bulan (Khusuf)</button>
+  </div>
+
+  <section id="page-hisab" class="page active">
+    <div class="card">
+      <div class="title">📍 Lokasi & Waktu Hisab (Markaz)</div>
+
+      <div class="grid-3">
+        <div><label>Nama Tempat / Kota</label><input id="h_kota" type="text" value="Jakarta"></div>
+        <div>
+          <label>Ketinggian (m. dpl)</label>
+          <input id="h_tt" type="number" value="10" step="0.1">
+        </div>
+        <div>
+          <label>Time Zone (GMT/UTC)</label>
+          <select id="h_tz">
+            <option value="0">UTC+00 (GMT)</option>
+            <option value="1">UTC+01</option><option value="2">UTC+02</option><option value="3">UTC+03</option><option value="4">UTC+04</option><option value="5">UTC+05</option><option value="6">UTC+06</option>
+            <option value="7" selected>UTC+07 (WIB)</option>
+            <option value="8">UTC+08 (WITA)</option>
+            <option value="9">UTC+09 (WIT)</option>
+            <option value="10">UTC+10</option><option value="11">UTC+11</option><option value="12">UTC+12</option>
+            <option value="-1">UTC-01</option><option value="-2">UTC-02</option><option value="-3">UTC-03</option><option value="-4">UTC-04</option><option value="-5">UTC-05</option><option value="-6">UTC-06</option><option value="-7">UTC-07</option><option value="-8">UTC-08</option><option value="-9">UTC-09</option><option value="-10">UTC-10</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <label>Bujur Tempat (Longitude)</label>
+          <div class="coord">
+            <input type="number" id="h_lon_d" value="106" placeholder="Derajat">
+            <input type="number" id="h_lon_m" value="49" placeholder="Menit">
+            <input type="number" id="h_lon_s" value="0" step="0.01" placeholder="Detik">
+            <select id="h_lon_dir"><option value="1">BT</option><option value="-1">BB</option></select>
+          </div>
+        </div>
+        <div>
+          <label>Lintang Tempat (Latitude)</label>
+          <div class="coord">
+            <input type="number" id="h_lat_d" value="6" placeholder="Derajat">
+            <input type="number" id="h_lat_m" value="10" placeholder="Menit">
+            <input type="number" id="h_lat_s" value="0" step="0.01" placeholder="Detik">
+            <select id="h_lat_dir"><option value="-1">LS</option><option value="1">LU</option></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-3" style="border-top: 1px dashed var(--line); padding-top: 15px; margin-top: 5px;">
+        <div style="grid-column: span 2;">
+          <label>Keterkaitan Bulan (Otomatis)</label>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <select id="h_bulanAkhir" style="flex:1" onchange="syncBulan('akhir')"></select>
+            <span style="color:var(--muted); font-size:20px;">➔</span>
+            <select id="h_bulanAwal" style="flex:1" onchange="syncBulan('awal')"></select>
+          </div>
+        </div>
+        <div><label>Tahun Hijriyah</label><input type="number" id="h_tahunH" value="1446"></div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <label>Kriteria Imkan Rukyat</label>
+          <select id="h_kriteria">
+            <option value="mabims">MABIMS Baru (Tinggi ≥ 3°, Elongasi ≥ 6.4°)</option>
+            <option value="wujudul">Wujudul Hilal (Tinggi > 0°, Ijtima' Qablal Ghurub)</option>
+            <option value="danjon">Danjon (Elongasi ≥ 7°)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="btns">
+        <button class="btn primary" onclick="hitungHisab()">🧮 Hitung Hisab Awal Bulan</button>
+        <button class="btn secondary" onclick="autoGPS('h')">📍 Lacak Lokasi GPS</button>
+      </div>
+      <div id="h_gps_status" class="gps-status"></div>
+    </div>
+    <div id="h_error" class="error"></div>
+
+    <div id="h_result" class="result-area">
+      <div class="subtabs" id="h_subtabs">
+        <button class="subtab active" onclick="openSubTab('h', 't1')">Hisab Ijtima'</button>
+        <button class="subtab" onclick="openSubTab('h', 't2')">Julian Date & Matahari</button>
+        <button class="subtab" onclick="openSubTab('h', 't3')">Data Bulan</button>
+        <button class="subtab" style="background: var(--gold); color: #000;" onclick="openSubTab('h', 't4')">HASIL & KESIMPULAN</button>
+      </div>
+
+      <div id="h_panel_t1" class="panel active">
+        <div class="card">
+          <div class="title">HISAB IJTIMAK AKHIR BULAN</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Kode</th><th>Formula</th><th>Desimal</th><th>DMS</th></tr></thead>
+              <tbody id="tbl_h_ijtima"></tbody>
+            </table>
+          </div>
+          <br>
+          <div class="title">Konversi JD Ijtimak ke Jam, Hari, Pasaran, Tanggal, Bulan & Tahun Masehi</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Kode</th><th>Formula</th><th>Hasil</th></tr></thead>
+              <tbody id="tbl_h_konversi"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="h_panel_t2" class="panel">
+        <div class="card">
+          <div class="title">JULIAN DATE</div>
+          <div class="table-wrap" style="margin-bottom: 20px;">
+            <table>
+              <thead><tr><th>Kode</th><th>Formula</th><th>Hasil</th></tr></thead>
+              <tbody id="tbl_h_jd"></tbody>
+            </table>
+          </div>
+          <div class="title">DATA MATAHARI</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Kode</th><th>Formula</th><th>Desimal</th><th>DMS</th></tr></thead>
+              <tbody id="tbl_h_matahari"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="h_panel_t3" class="panel">
+        <div class="card">
+          <div class="title">DATA BULAN</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Kode</th><th>Formula</th><th>Desimal</th><th>DMS</th></tr></thead>
+              <tbody id="tbl_h_bulan"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="h_panel_t4" class="panel">
+        <div class="print-box">
+          <h2>HASIL HISAB</h2>
+          <table class="print-table">
+            <tr><td>Ijtima' Hari/Tanggal</td><td>=</td><td><span id="p_ijt_hari"></span>, <span id="p_ijt_tgl"></span></td></tr>
+            <tr><td>Pukul</td><td>=</td><td><span id="p_ijt_jam"></span> <span class="p_tz"></span></td></tr>
+            <tr><td colspan="3" class="print-header" style="text-align:left;">Data saat ghurub Hari <span id="p_g_hari"></span> Tgl <span id="p_g_tgl"></span> Bln <span id="p_g_bln"></span> Thn <span id="p_g_thn"></span></td></tr>
+            <tr><td>Maghrib Pukul</td><td>=</td><td><span id="p_maghrib"></span> <span class="p_tz"></span></td></tr>
+            <tr><td>Arah Matahari [Azm]</td><td>=</td><td><span id="p_azm"></span></td></tr>
+            <tr><td>Arah Hilal (UTSB) [Azc]</td><td>=</td><td><span id="p_azc"></span></td></tr>
+            <tr><td>Arah Hilal dari matahari [z]</td><td>=</td><td><span id="p_z"></span></td></tr>
+            <tr><td>Tinggi Haqiqi [hc]</td><td>=</td><td><span id="p_hc"></span></td></tr>
+            <tr><td>Tinggi Mar'i [hc']</td><td>=</td><td><span id="p_hcp"></span></td></tr>
+            <tr><td>Umur Bulan [Umur]</td><td>=</td><td><span id="p_umur"></span></td></tr>
+            <tr><td>Elongasi Bulan-Matahari [EL]</td><td>=</td><td><span id="p_el"></span></td></tr>
+            <tr><td>Besar cahaya Hilal [FI]</td><td>=</td><td><span id="p_fi"></span></td></tr>
+            <tr><td>Lebar Sabit [Cw]</td><td>=</td><td><span id="p_cw"></span> mt</td></tr>
+            <tr><td>Lama Hilal di atas ufuq [Mukts]</td><td>=</td><td><span id="p_mukts"></span></td></tr>
+            <tr><td>Hilal terbenam pukul [Ms]</td><td>=</td><td><span id="p_ms"></span> <span class="p_tz"></span></td></tr>
+            <tr><td>Kemiringan Hilal [Miring]</td><td>=</td><td><span id="p_miring"></span></td></tr>
+          </table>
+
+          <div class="kesimpulan-box">
+            <strong>Kesimpulan Awal Bulan <span id="p_k_awalbulan"></span> Jatuh pada :</strong><br><br>
+            <table style="width:100%; font-size:16px;">
+              <tr><td style="width:120px;">Hari</td><td style="width:20px;">:</td><td><strong><span id="p_k_hari"></span></strong></td></tr>
+              <tr><td>Tanggal</td><td>:</td><td><strong><span id="p_k_tgl"></span> M.</strong></td></tr>
+              <tr><td>Status Kriteria</td><td>:</td><td><strong><span id="p_k_status"></span></strong></td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="page-gerhana" class="page">
+    <div class="card">
+      <div class="title">📍 Parameter Gerhana Bulan (Khusuf al-Qamar)</div>
+
+      <div class="grid-3">
+        <div><label>Nama Tempat / Kota</label><input id="g_kota" type="text" value="Jakarta"></div>
+        <div><label>Ketinggian (m. dpl)</label><input id="g_tt" type="number" value="10"></div>
+        <div>
+          <label>Time Zone (GMT/UTC)</label>
+          <select id="g_tz">
+            <option value="0">UTC+00</option><option value="7" selected>UTC+07 (WIB)</option><option value="8">UTC+08 (WITA)</option><option value="9">UTC+09 (WIT)</option>
+            </select>
+        </div>
+      </div>
+
+      <div class="grid-3" style="border-top: 1px dashed var(--line); padding-top: 15px;">
+        <div>
+          <label>Pencarian Berdasarkan Kalender</label>
+          <select id="g_mode" onchange="toggleGMode()">
+            <option value="hijri">Bulan & Tahun Hijriyah</option>
+            <option value="masehi">Tanggal, Bulan, Tahun Masehi</option>
+          </select>
+        </div>
+
+        <div class="g-mode-h"><label>Bulan Hijriyah</label><select id="g_bulanH"></select></div>
+        <div class="g-mode-h"><label>Tahun Hijriyah</label><input type="number" id="g_tahunH" value="1446"></div>
+
+        <div class="g-mode-m" style="display:none;"><label>Tanggal Masehi</label><input type="number" id="g_tglM" value="15" min="1" max="31"></div>
+        <div class="g-mode-m" style="display:none;"><label>Bulan Masehi</label><input type="number" id="g_blnM" value="9" min="1" max="12"></div>
+        <div class="g-mode-m" style="display:none;"><label>Tahun Masehi</label><input type="number" id="g_thnM" value="2024"></div>
+      </div>
+
+      <div class="btns">
+        <button class="btn primary" onclick="hitungGerhana()">🌘 Hitung Gerhana Bulan</button>
+        <button class="btn secondary" onclick="autoGPS('g')">📍 Lacak Lokasi GPS</button>
+      </div>
+      <div id="g_gps_status" class="gps-status"></div>
+    </div>
+    <div id="g_error" class="error"></div>
+
+    <div id="g_result" class="result-area">
+      <div class="subtabs" id="g_subtabs">
+        <button class="subtab active" onclick="openSubTab('g', 't1')">Ma'rifah Khusuf (Data Dasar)</button>
+        <button class="subtab" onclick="openSubTab('g', 't2')">Waktu & Fase Gerhana</button>
+        <button class="subtab" style="background: var(--gold); color: #000;" onclick="openSubTab('g', 't3')">KESIMPULAN</button>
+      </div>
+
+      <div id="g_panel_t1" class="panel active">
+        <div class="card">
+          <div class="title">Ma'rifah Khusuf al-Qamar</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Kode</th><th>Formula</th><th>Desimal</th><th>DMS</th></tr></thead>
+              <tbody id="tbl_g_dasar"></tbody>
+            </table>
+          </div>
+          <br>
+          <div class="title">Konversi JD Gerhana</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Kode</th><th>Formula</th><th>Hasil</th></tr></thead>
+              <tbody id="tbl_g_konversi"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="g_panel_t2" class="panel">
+        <div class="card">
+          <div class="title">Ma'rifah Sa'ah al-Khusuf</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Kode</th><th>Formula</th><th>Desimal</th><th>DMS / Waktu</th></tr></thead>
+              <tbody id="tbl_g_waktu"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="g_panel_t3" class="panel">
+        <div class="print-box">
+          <h2>KESIMPULAN GERHANA BULAN</h2>
+          <p style="text-align:center; font-size:16px; margin-bottom:20px;">
+            Pencarian untuk: <strong><span id="p_g_target"></span></strong><br>
+            Status: <strong style="color:red;" id="p_g_status"></strong>
+          </p>
+          <table class="print-table eclipse-table">
+            <tr><td>Awal Penumbra</td><td id="e_w1"></td></tr>
+            <tr><td>Awal Umbra</td><td id="e_w2"></td></tr>
+            <tr><td>Awal Total</td><td id="e_w3"></td></tr>
+            <tr><td>Puncak Gerhana</td><td id="e_t0" style="font-weight:bold;"></td></tr>
+            <tr><td>Akhir Total</td><td id="e_w4"></td></tr>
+            <tr><td>Akhir Umbra</td><td id="e_w5"></td></tr>
+            <tr><td>Akhir Penumbra</td><td id="e_w6"></td></tr>
+          </table>
+          <p style="font-size:13px; color:#555; text-align:center; margin-top:20px;"><i>Catatan: Jika waktu bernilai "—", artinya fase tersebut tidak terjadi pada gerhana kali ini. Waktu di atas dalam zona waktu <span class="p_g_tz"></span>.</i></p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<script>
+// --- MATH & UTILS CONSTANTS ---
+const PI = Math.PI, D2R = PI / 180, R2D = 180 / PI;
+function sind(x){return Math.sin(x*D2R)}
+function cosd(x){return Math.cos(x*D2R)}
+function tand(x){return Math.tan(x*D2R)}
+function asind(x){return Math.asin(Math.max(-1,Math.min(1,x)))*R2D}
+function acosd(x){return Math.acos(Math.max(-1,Math.min(1,x)))*R2D}
+function atand(x){return Math.atan(x)*R2D}
+function atan2d(y, x){return Math.atan2(y, x)*R2D}
+function mod(x, m){return ((x%m)+m)%m}
+function mod360(x){return mod(x, 360)}
+function frac(x){return x - Math.floor(x)}
+function fix(x){return Math.floor(x)}
+function norm180(x){let a = mod(x+180, 360)-180; return a === -180 ? 180 : a}
+function clamp(x, a, b){return Math.max(a, Math.min(b, x))}
+
+// --- FORMATTING HELPERS ---
+function fmtNum(x, dp=7) {
+  if (x === null || x === undefined || Number.isNaN(x) || !Number.isFinite(Number(x))) return '—';
+  let v = Number(x); let s = v.toFixed(dp);
+  return s.replace(/(\.\d*?[1-9])0+$/, '$1').replace(/\.0+$/, '');
+}
+
+function fmtDMS(x, isTime = false) {
+  if (x === null || x === undefined || Number.isNaN(x) || !Number.isFinite(Number(x))) return '—';
+  let sign = x < 0 ? '-' : '';
+  let a = Math.abs(x);
+  let d = Math.floor(a);
+  let mf = (a - d) * 60;
+  let m = Math.floor(mf);
+  let s = (mf - m) * 60;
+  if (s >= 59.995) { s = 0; m += 1; }
+  if (m >= 60) { m = 0; d += 1; }
+
+  if (isTime) {
+    let hh = d % 24;
+    return `${String(hh).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(Math.round(s)).padStart(2,'0')}`;
+  }
+  return `${sign}${d}° ${String(m).padStart(2,'0')}' ${s.toFixed(2).padStart(5,'0')}"`;
+}
+
+function fmtJam(h) {
+  if (h === null || h === undefined || Number.isNaN(h) || !Number.isFinite(h)) return '—';
+  return fmtDMS(mod(h, 24), true);
+}
+
+function coordToDec(d, m, s, dir) {
+  return (+dir) * (Math.abs(+d || 0) + (+m || 0)/60 + (+s || 0)/3600);
+}
+
+const NAMA_BULAN_H = ['Muharram','Safar','Rabiul Awal','Rabiul Akhir','Jumadal Ula','Jumadal Akhirah','Rajab','Syaban','Ramadhan','Syawal','Dzulqaidah','Dzulhijjah'];
+const NAMA_BULAN_M = ['','Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const HARI = {1:'Ahad',2:'Senin',3:'Selasa',4:'Rabu',5:'Kamis',6:'Jum\'at',0:'Sabtu',7:'Sabtu'};
+const PASARAN = {1:'Legi',2:'Pahing',3:'Pon',4:'Wage',0:'Kliwon',5:'Kliwon'};
+
+// --- UI INITS ---
+function initDropdowns() {
+  const hb1 = document.getElementById('h_bulanAkhir');
+  const hb2 = document.getElementById('h_bulanAwal');
+  const gb = document.getElementById('g_bulanH');
+
+  NAMA_BULAN_H.forEach((b, i) => {
+    let o1 = new Option((i+1)+". "+b, i+1);
+    let o2 = new Option((i+1)+". "+b, i+1);
+    let o3 = new Option((i+1)+". "+b, i+1);
+    hb1.add(o1); hb2.add(o2); gb.add(o3);
+  });
+
+  // Default Akhir Ramadhan -> Awal Syawal
+  hb1.value = "9"; hb2.value = "10"; gb.value = "9";
+}
+
+function syncBulan(trigger) {
+  const bAkhir = document.getElementById('h_bulanAkhir');
+  const bAwal = document.getElementById('h_bulanAwal');
+  let v1 = parseInt(bAkhir.value);
+  let v2 = parseInt(bAwal.value);
+
+  if(trigger === 'akhir') {
+    bAwal.value = v1 === 12 ? 1 : v1 + 1;
+  } else {
+    bAkhir.value = v2 === 1 ? 12 : v2 - 1;
+  }
+}
+
+function toggleGMode() {
+  let m = document.getElementById('g_mode').value;
+  document.querySelectorAll('.g-mode-h').forEach(e => e.style.display = m === 'hijri' ? 'block' : 'none');
+  document.querySelectorAll('.g-mode-m').forEach(e => e.style.display = m === 'masehi' ? 'block' : 'none');
+}
+
+function openMainTab(tab) {
+  document.querySelectorAll('.main-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.main-tab[onclick*="${tab}"]`).classList.add('active');
+  document.getElementById(`page-${tab}`).classList.add('active');
+}
+
+function openSubTab(prefix, tab) {
+  document.querySelectorAll(`#${prefix}_subtabs .subtab`).forEach(b => b.classList.remove('active'));
+  document.querySelectorAll(`#${prefix}_result .panel`).forEach(p => p.classList.remove('active'));
+  document.querySelector(`#${prefix}_subtabs .subtab[onclick*="${tab}"]`).classList.add('active');
+  document.getElementById(`${prefix}_panel_${tab}`).classList.add('active');
+}
+
+function tRow(kode, rumus, dec, dms, opt={}) {
+  if (opt.isSection) return `<tr class="section-row"><td colspan="4">${rumus}</td></tr>`;
+  return `<tr><td class="kode">${kode}</td><td class="rumus">${rumus}</td><td class="num">${dec}</td><td class="dms">${dms}</td></tr>`;
+}
+
+function tRow2(kode, rumus, val) {
+  return `<tr><td class="kode">${kode}</td><td class="rumus">${rumus}</td><td style="font-weight:bold; color: #fff;">${val}</td></tr>`;
+}
+
+function tzName(tz) { return `UTC${tz >= 0 ? '+' : ''}${tz}`; }
+
+// --- GPS LOGIC ---
+async function reverseGeocode(lat, lon) {
+  try {
+    let res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`);
+    let data = await res.json();
+    return data.address.city || data.address.town || data.address.county || data.display_name.split(',')[0];
+  } catch(e) { return null; }
+}
+
+function autoGPS(prefix) {
+  const stat = document.getElementById(`${prefix}_gps_status`);
+  if (!navigator.geolocation) { stat.textContent = "Browser tidak support GPS."; return; }
+  stat.textContent = "Mencari koordinat GPS...";
+
+  navigator.geolocation.getCurrentPosition(async pos => {
+    let lat = pos.coords.latitude, lon = pos.coords.longitude;
+    let tzOffset = -new Date().getTimezoneOffset() / 60;
+
+    let aLat = Math.abs(lat), aLon = Math.abs(lon);
+    let dLat = Math.floor(aLat), mLat = Math.floor((aLat-dLat)*60), sLat = ((aLat-dLat)*60 - mLat)*60;
+    let dLon = Math.floor(aLon), mLon = Math.floor((aLon-dLon)*60), sLon = ((aLon-dLon)*60 - mLon)*60;
+
+    if(prefix === 'h') {
+      document.getElementById('h_lat_d').value = dLat; document.getElementById('h_lat_m').value = mLat; document.getElementById('h_lat_s').value = sLat.toFixed(2);
+      document.getElementById('h_lat_dir').value = lat >= 0 ? "1" : "-1";
+      document.getElementById('h_lon_d').value = dLon; document.getElementById('h_lon_m').value = mLon; document.getElementById('h_lon_s').value = sLon.toFixed(2);
+      document.getElementById('h_lon_dir').value = lon >= 0 ? "1" : "-1";
+      document.getElementById('h_tz').value = tzOffset;
+    } else {
+      document.getElementById('g_tz').value = tzOffset;
+    }
+
+    let nama = await reverseGeocode(lat, lon);
+    if(nama) document.getElementById(`${prefix}_kota`).value = nama;
+    stat.textContent = `📍 Ditemukan: Lat ${lat.toFixed(4)}, Lon ${lon.toFixed(4)} (Akurasi: ${Math.round(pos.coords.accuracy)}m)`;
+  }, err => {
+    stat.textContent = "Akses GPS ditolak/gagal. Isi manual.";
+  });
+}
+
+// --- ALGORITMA KONVERSI ---
+function jdToMasehi(jd) {
+  let Z = fix(jd + 0.5), F = (jd + 0.5) - Z;
+  let A = Z;
+  if (Z >= 2299161) { let alpha = fix((Z - 1867216.25)/36524.25); A = Z + 1 + alpha - fix(alpha/4); }
+  let B = A + 1524, C = fix((B - 122.1)/365.25), D = fix(365.25 * C), E = fix((B - D)/30.6001);
+  let d = B - D - fix(30.6001 * E) + F;
+  let m = E < 14 ? E - 1 : E - 13;
+  let y = m > 2 ? C - 4716 : C - 4715;
+  return { y, m, d: fix(d), h: (d - fix(d))*24 };
+}
+
+function gregorianToJD(y, m, d, hLocal, tz) {
+  let BYDH = m < 3 ? m + 12 : m, TYDH = m < 3 ? y - 1 : y;
+  let A = fix(y / 100), B = 2 - A + fix(A / 4);
+  let JD = fix(365.25 * (TYDH + 4716)) + fix(30.6001 * (BYDH + 1)) + d + ((hLocal - tz) / 24) + B - 1524.5;
+  return { A, B, BYDH, TYDH, JD, T: (JD - 2451545) / 36525 };
+}
+
+function konversi(jd, tz) {
+  let Z = fix(jd);
+  let AA = fix((Z - 1867216.25) / 36524.25);
+  let A = Z + 1 + AA - fix(AA / 4);
+  let B = A + 1524, C = fix((B - 122.1)/365.25), D = fix(365.25 * C), E = fix((B - D)/30.6001);
+  let Tgl = fix(B - D - fix(30.6001 * E));
+  let Bln = E < 14 ? E - 1 : E - 13;
+  let Thn = Bln <= 2 ? C - 4715 : C - 4716;
+  let WI = frac(jd) * 24, WD = WI + tz;
+
+  let Hr = mod(Z + 2, 7);
+  let Ps = mod(Z + 1, 5);
+
+  // Pembenahan tanggal lokal agar tidak salah saat melewati jam 24 atau mundur hari.
+  let local = jdToMasehi(jd + tz/24);
+  let localZ = fix(jd + tz/24);
+  let HrFix = mod(localZ + 2, 7);
+  let PsFix = mod(localZ + 1, 5);
+  let WDFix = mod(WD, 24);
+
+  return { Z, AA, A, B, C, D, E, Tgl, Bln, Thn, WI, WD, Hr, Ps,
+           hari: HARI[HrFix], pasaran: PASARAN[PsFix],
+           tglF: local.d, blnF: local.m, thnF: local.y, wdF: WDFix };
+}
+
+// --- PEMBENAHAN DATA BULAN: helper astronomi yang lebih stabil ---
+function localSiderealTime(jd, lon) {
+  let T = (jd - 2451545.0) / 36525;
+  let theta = 280.46061837 + 360.98564736629 * (jd - 2451545.0) + 0.000387933 * T * T - (T * T * T) / 38710000;
+  return mod360(theta + lon);
+}
+
+function eclipticToEquatorial(lambda, beta, eps) {
+  let alpha = mod360(atan2d(sind(lambda) * cosd(eps) - tand(beta) * sind(eps), cosd(lambda)));
+  let delta = asind(sind(beta) * cosd(eps) + cosd(beta) * sind(eps) * sind(lambda));
+  return { alpha, delta };
+}
+
+function horizontalFromEquatorial(alpha, delta, lat, jd, lon) {
+  let lst = localSiderealTime(jd, lon);
+  let H = norm180(lst - alpha);
+  let alt = asind(sind(lat) * sind(delta) + cosd(lat) * cosd(delta) * cosd(H));
+  let az = mod360(atan2d(-sind(H), tand(delta) * cosd(lat) - sind(lat) * cosd(H)));
+  return { lst, H, alt, az };
+}
+
+function refractionBennett(h) {
+  if (!Number.isFinite(h) || h < -5) return 0;
+  return (1.02 / tand(h + 10.3 / (h + 5.11))) / 60;
+}
+
+function moonSetDeltaHours(hcTengah, Hmoon, deltac, lat, sdc) {
+  if (!Number.isFinite(hcTengah) || hcTengah <= 0) return 0;
+  let h0 = -sdc;
+  let cosHset = (sind(h0) - sind(lat) * sind(deltac)) / (cosd(lat) * cosd(deltac));
+  if (!Number.isFinite(cosHset)) return 0;
+  if (cosHset < -1) return 12;
+  if (cosHset > 1) return 0;
+  let Hset = acosd(cosHset);
+  let Hnow = mod360(Hmoon);
+  if (Hnow > 180) Hnow -= 360;
+  let diff = Hset - Hnow;
+  if (diff < 0) diff += 360;
+  let hours = diff / 14.492; // laju sudut jam Bulan kira-kira 14,492° per jam.
+  if (hours > 24) return 0;
+  return hours;
+}
+
+// --- ALGORITMA HISAB AWAL BULAN ---
+function hitungHisab() {
+  try {
+    let err = document.getElementById('h_error'); err.style.display = 'none';
+    let tz = +document.getElementById('h_tz').value;
+    let tt = +document.getElementById('h_tt').value || 0;
+    let bAkhir = +document.getElementById('h_bulanAkhir').value;
+    let bAwal = +document.getElementById('h_bulanAwal').value;
+    let thnH = +document.getElementById('h_tahunH').value;
+    let lon = coordToDec(document.getElementById('h_lon_d').value, document.getElementById('h_lon_m').value, document.getElementById('h_lon_s').value, document.getElementById('h_lon_dir').value);
+    let lat = coordToDec(document.getElementById('h_lat_d').value, document.getElementById('h_lat_m').value, document.getElementById('h_lat_s').value, document.getElementById('h_lat_dir').value);
+
+    // 1. IJTIMAK
+    let HY = thnH + (bAkhir * 29.53) / 354.3671;
+    let K = Math.round((HY - 1410) * 12);
+    let T = K / 1200;
+    let JD = 2447740.652 + 29.53058868 * K + 0.0001178 * T * T;
+    let M = mod360(29.10535608 * K + 207.9587074 - 0.0000333 * T * T);
+    let Mp = mod360(385.81691806 * K + 111.1791307 + 0.0107306 * T * T);
+    let F = mod360(390.67050646 * K + 164.2162296 - 0.0016528 * T * T);
+    let T1 = (0.1734 - 0.000395 * T) * sind(M);
+    let T2 = 0.0021 * sind(2 * M);
+    let T3 = -0.4068 * sind(Mp);
+    let T4 = 0.0161 * sind(2 * Mp);
+    let T5 = -0.0004 * sind(3 * Mp);
+    let T6 = 0.0104 * sind(2 * F);
+    let T7 = -0.0051 * sind(M + Mp);
+    let T8 = -0.0074 * sind(M - Mp);
+    let T9 = 0.0004 * sind(2 * F + M);
+    let T10 = -0.0004 * sind(2 * F - M);
+    let T11 = -0.0006 * sind(2 * F + Mp);
+    let T12 = 0.001 * sind(2 * F - Mp);
+    let T13 = 0.0005 * sind(M + 2 * Mp);
+    let MT = T1 + T2 + T3 + T4 + T5 + T6 + T7 + T8 + T9 + T10 + T11 + T12 + T13;
+    let JD_Ijt = JD + 0.5 + MT;
+    let JD_Ex = JD_Ijt - 2415019;
+
+    let konv = konversi(JD_Ijt, tz);
+
+    let htmlT1 = [
+      tRow('HY','TahunH+(BlnH×29.53)/354.3671', fmtNum(HY), '—'),
+      tRow('K','round((HY-1410)×12)', K, '—'),
+      tRow('T','K/1200', fmtNum(T), '—'),
+      tRow('JD','2447740.652+29.53058868×K+...', fmtNum(JD), '—'),
+      tRow('M','(29.10535608×K + 207.9587074 + ...) mod 360', fmtNum(M), fmtDMS(M)),
+      tRow("M'",'(385.81691806×K+111.1791307+...) mod 360', fmtNum(Mp), fmtDMS(Mp)),
+      tRow('F','(390.67050646 × K+164.2162296+...) mod 360', fmtNum(F), fmtDMS(F)),
+      tRow('T1','(0.1734-0.000395×T)×Sin(M)', fmtNum(T1), fmtDMS(T1)),
+      tRow('T2','0.0021×Sin(2×M)', fmtNum(T2), fmtDMS(T2)),
+      tRow('T3',"-0.4068×Sin(M')", fmtNum(T3), fmtDMS(T3)),
+      tRow('T4',"0.0161×Sin(2×M')", fmtNum(T4), fmtDMS(T4)),
+      tRow('T5',"-0.0004×Sin(3×M')", fmtNum(T5), fmtDMS(T5)),
+      tRow('T6','0.0104×Sin(2×F)', fmtNum(T6), fmtDMS(T6)),
+      tRow('T7',"-0.0051×Sin(M+M')", fmtNum(T7), fmtDMS(T7)),
+      tRow('T8',"-0.0074×Sin(M-M')", fmtNum(T8), fmtDMS(T8)),
+      tRow('T9','0.0004×Sin(2×F+M)', fmtNum(T9), fmtDMS(T9)),
+      tRow('T10','-0.0004×Sin(2×F-M)', fmtNum(T10), fmtDMS(T10)),
+      tRow('T11',"-0.0006×Sin(2×F+M')", fmtNum(T11), fmtDMS(T11)),
+      tRow('T12',"0.001×Sin(2×F-M')", fmtNum(T12), fmtDMS(T12)),
+      tRow('T13',"0.0005×Sin(M+2×M')", fmtNum(T13), fmtDMS(T13)),
+      tRow('MT','Jumlah (T1 s/d T13)', fmtNum(MT), fmtDMS(MT)),
+      tRow('JD Ijtimak','JD + 0.5 + MT =', fmtNum(JD_Ijt), '—'),
+      tRow('JD Excel','JD Ijtimak - 2415019 =', fmtNum(JD_Ex), '—')
+    ].join('');
+    document.getElementById('tbl_h_ijtima').innerHTML = htmlT1;
+
+    let htmlK = [
+      tRow2('Z', "Int(JD Ijtima')", konv.Z), tRow2('AA', "Int((Z-1867216.25)/36524.25)", konv.AA),
+      tRow2('A', "Z+1+AA-Int(AA/4)", konv.A), tRow2('B', "A+1524", konv.B),
+      tRow2('C', "Int((B-122.1)/365.25)", konv.C), tRow2('D', "Int(365.25×C)", konv.D),
+      tRow2('E', "Int((B-D)/30.6001)", konv.E), tRow2('Tgl', "Int(B-D-Int(30.6001×E))", konv.Tgl),
+      tRow2('Bln', "E-1", `${konv.Bln} (${NAMA_BULAN_M[konv.Bln]})`), tRow2('Thn', "Bln <= 2 : C-4715, > 2 : C-4716", konv.Thn),
+      tRow2('WI', "Frac(JD Ijtimak) × 24", fmtJam(konv.WI)), tRow2('WD', "WI + TZ", `${fmtJam(konv.WD)} ${tzName(tz)}`),
+      tRow2('Hr', "(Z+2) mod 7", `${konv.Hr} = ${konv.hari}`), tRow2('Ps', "(Z+1) mod 5", `${konv.Ps} = ${konv.pasaran}`)
+    ].join('');
+    document.getElementById('tbl_h_konversi').innerHTML = htmlK;
+
+    // Menentukan tanggal observasi (1 hari sebelum / hari H)
+    let loc = jdToMasehi(JD_Ijt + tz/24);
+    let jd0 = gregorianToJD(loc.y, loc.m, loc.d, 18, tz);
+    let sun0 = calcSun(jd0.JD, jd0.T, lat, lon, tz, tt);
+
+    // Apakah ijtimak terjadi sesudah ghurub hari itu?
+    let obsD = loc.d;
+    if (loc.h > mod(sun0.GrWD, 24)) { obsD += 1; }
+
+    let jdG = gregorianToJD(loc.y, loc.m, obsD, 18, tz);
+    let sunG = calcSun(jdG.JD, jdG.T, lat, lon, tz, tt);
+
+    // Iterasi kedua untuk JD yang tepat di waktu maghrib
+    let jdFinal = gregorianToJD(loc.y, loc.m, obsD, mod(sunG.GrWD, 24), tz);
+    let sun = calcSun(jdFinal.JD, jdFinal.T, lat, lon, tz, tt);
+
+    let moon = calcMoon(jdFinal.JD, jdFinal.T, sun, lat, lon, tt);
+
+    // PENYEMPURNAAN UMUR BULAN TERKONEKSI PENUH: JD Matahari Terbenam dikurangi JD Ijtima' dikali 24 jam
+    moon.umur = (jdFinal.JD - JD_Ijt) * 24;
+
+    let htmlJD = [
+      tRow2('A','Int(ThnM/100)', jdFinal.A),
+      tRow2('B','2-A+Int(A/4)', jdFinal.B),
+      tRow2('BYDH','If(BulanM<3, BulanM+12, BulanM)', jdFinal.BYDH),
+      tRow2('TYDH','If(BulanM<3, TahunM-1, TahunM)', jdFinal.TYDH),
+      tRow2('JD','Int(365.25 × (TYDH+4716)) + Int(30.6001 × (BYDH+1)) + ...', fmtNum(jdFinal.JD)),
+      tRow2('T','(JD - 2451545) / 36525', fmtNum(jdFinal.T)),
+      tRow2('Dip','1.76/60 × √TT', `${fmtNum(sun.Dip)} &nbsp; | &nbsp; <span style="color:var(--gold); font-family:var(--mono);">${fmtDMS(sun.Dip)}</span>`)
+    ].join('');
+    document.getElementById('tbl_h_jd').innerHTML = htmlJD;
+
+    let htmlSun = [
+      tRow('S','(280.46645 + 36000.76983 × T) mod 360', fmtNum(sun.S), fmtDMS(sun.S)),
+      tRow('m','(357.5291 + 35999.0503 ×T) mod 360', fmtNum(sun.m), fmtDMS(sun.m)),
+      tRow('N','(125.04 - 1934.136 × T) mod 360', fmtNum(sun.N), fmtDMS(sun.N)),
+      tRow("K'",'(17.264 / 3600) × Sin(N) + (0.206 ...', fmtNum(sun.Kp), fmtDMS(sun.Kp)),
+      tRow('K"','(-1.264 / 3600) × Sin(2 × S)', fmtNum(sun.Kpp), fmtDMS(sun.Kpp)),
+      tRow("R'",'(9.23 / 3600) × Cos(N) - (0.09 ...', fmtNum(sun.Rp), fmtDMS(sun.Rp)),
+      tRow('R"','(0.548 / 3600) × Cos(2 × S)', fmtNum(sun.Rpp), fmtDMS(sun.Rpp)),
+      tRow("Q'",'23.43929111 + R\' + R" - ...', fmtNum(sun.Qp), fmtDMS(sun.Qp)),
+      tRow('E','(6898.06 / 3600) × Sin(m) + ...', fmtNum(sun.E), fmtDMS(sun.E)),
+      tRow("S'",'(S+E+K\'+K" - (20.47 / 3600)) mod 360', fmtNum(sun.Sp), fmtDMS(sun.Sp)),
+      tRow('δ',"Sin⁻¹(Sin(S') × Sin(Q'))", fmtNum(sun.delta), fmtDMS(sun.delta)),
+      tRow('Pta',"Tan⁻¹(Tan(S') × Cos(Q'))", fmtNum(sun.Pta), fmtDMS(sun.Pta)),
+      tRow('PT','Lihat S\' jika: 0 s/d 90 = Pta...', fmtNum(sun.PT), fmtDMS(sun.PT)),
+      tRow('e','(S - PT) / 15', fmtNum(sun.e), fmtJam(sun.e)),
+      tRow('sdm','0.267 / (1 - 0.017 × Cos(m))', fmtNum(sun.sdm), fmtDMS(sun.sdm)),
+      tRow('h','-(sdm + (34.5 / 60) + Dip)', fmtNum(sun.h), fmtDMS(sun.h)),
+      tRow('t','Cos⁻¹(-Tan(Lt) × Tan(δ) + Sin(h) ...', fmtNum(sun.t), fmtDMS(sun.t)),
+      tRow('Azm','Tan⁻¹(((-Sin(φ)/Tan(t)) + Cos(φ)...', fmtNum(sun.Azm), fmtDMS(sun.Azm)),
+      tRow('Gr LMT','t / 15 + (12 - e)', fmtNum(sun.GrLMT), fmtJam(sun.GrLMT)),
+      tRow('Gr WD','Gr LMT + ((TZ×15) - λ) / 15', fmtNum(sun.GrWD), fmtJam(sun.GrWD)),
+      tRow('Ra','1.00014 - 0.01671 × Cos(m) ...', fmtNum(sun.Ra)+' AU', '—'),
+      tRow('R','Ra x 149597870', fmtNum(sun.R)+' KM', '—')
+    ].join('');
+    document.getElementById('tbl_h_matahari').innerHTML = htmlSun;
+
+    let htmlMoon = [
+      tRow('M','(218.31617 + 481267.88088 × T)...', fmtNum(moon.M), fmtDMS(moon.M)),
+      tRow('A','(134.96292 + 477198.86753 × T)...', fmtNum(moon.A), fmtDMS(moon.A)),
+      tRow('F','(93.27283 + 483202.01873 × T)...', fmtNum(moon.F), fmtDMS(moon.F)),
+      tRow('D','(297.85027 + 445267.11135 × T)...', fmtNum(moon.D), fmtDMS(moon.D)),
+      tRow('T 1','(22640 / 3600) × Sin(A)', fmtNum(moon.T1), fmtDMS(moon.T1)),
+      tRow('T 2','(-4586 / 3600) × Sin(A - 2 × D)', fmtNum(moon.T2), fmtDMS(moon.T2)),
+      tRow('T 3','(2370 / 3600) × Sin(2 × D)', fmtNum(moon.T3), fmtDMS(moon.T3)),
+      tRow('T 4','(769 / 3600) × Sin(2 × A)', fmtNum(moon.T4), fmtDMS(moon.T4)),
+      tRow('T 5','(-668 / 3600) × Sin(m)', fmtNum(moon.T5), fmtDMS(moon.T5)),
+      tRow('T 6','(-412 / 3600) × Sin(2 × F)', fmtNum(moon.T6), fmtDMS(moon.T6)),
+      tRow('T 7','(-212 / 3600) × Sin(2 × A - 2 × D)', fmtNum(moon.T7), fmtDMS(moon.T7)),
+      tRow('T 8','(-206 / 3600) × Sin(A + m - 2 × D)', fmtNum(moon.T8), fmtDMS(moon.T8)),
+      tRow('T 9','(192 / 3600) × Sin(A + 2 × D)', fmtNum(moon.T9), fmtDMS(moon.T9)),
+      tRow('T 10','(-165 / 3600) × Sin(m - 2 × D)', fmtNum(moon.T10), fmtDMS(moon.T10)),
+      tRow('T 11','(148 / 3600) × Sin(A - m)', fmtNum(moon.T11), fmtDMS(moon.T11)),
+      tRow('T 12','(-125 / 3600) × Sin(D)', fmtNum(moon.T12), fmtDMS(moon.T12)),
+      tRow('T 13','(-110 / 3600) × Sin(A + m)', fmtNum(moon.T13), fmtDMS(moon.T13)),
+      tRow('T 14','(-55 / 3600) × Sin(2 × F - 2 × D)', fmtNum(moon.T14), fmtDMS(moon.T14)),
+      tRow('C','Jumlah (T1 s/d T14)', fmtNum(moon.C), fmtDMS(moon.C)),
+      tRow('Mo','(M + C + K\' + K" - (20.47 / 3600)) mod 360', fmtNum(moon.Mo), fmtDMS(moon.Mo)),
+      tRow("A'",'A+T2+T3+T5', fmtNum(moon.Ap), fmtDMS(moon.Ap)),
+      tRow("L'",'(18461/3600) × Sin(F) + ...', fmtNum(moon.Lp), fmtDMS(moon.Lp)),
+      tRow('x',"Tan⁻¹(Sin(Mo) × Tan(Q'))", fmtNum(moon.x), fmtDMS(moon.x)),
+      tRow('y',"L'+x", fmtNum(moon.y), fmtDMS(moon.y)),
+      tRow('δc',"Sin⁻¹(Sin(Mo) × Sin(Q') × Sin(y) / Sin(x) )", fmtNum(moon.deltac), fmtDMS(moon.deltac)),
+      tRow('Ptc a',"Cos⁻¹( Cos(Mo) × Cos(L') / Cos(δc))", fmtNum(moon.Ptca), fmtDMS(moon.Ptca)),
+      tRow('PTc','Lihat Mo, Jika >180 = 360 - Ptc a ...', fmtNum(moon.PTc), fmtDMS(moon.PTc)),
+      tRow('tc','(PT - PTc + t) mod 360', fmtNum(moon.tc), fmtDMS(moon.tc)),
+      tRow('hc','Sin⁻¹( Sin(Lt) × Sin(δc) + ...', fmtNum(moon.hc), fmtDMS(moon.hc)),
+      tRow('p',"(384401 × (1 - 0.00301401)) / (1 + 0.0549 × Cos(A' + T1) )", fmtNum(moon.p)+' KM', '—'),
+      tRow('HP','0.9507/( p /384401)', fmtNum(moon.HP), fmtDMS(moon.HP)),
+      tRow('s.d.c','0.5181/( p /384401)/2', fmtNum(moon.sdc), fmtDMS(moon.sdc)),
+      tRow('P','HP×Cos(hc)', fmtNum(moon.P), fmtDMS(moon.P)),
+      tRow('Ref','0.0167 / Tan((hc + 7.31 / (hc + 4.4)))', fmtNum(moon.Ref), fmtDMS(moon.Ref)),
+      tRow("hc' a",'hc - P', fmtNum(moon.hca), fmtDMS(moon.hca)),
+      tRow("hc' [piringan atas]","If(hc' a > 0, hc' a + s.d.c + Ref + Dip, hc' a)", fmtNum(moon.hcAtas), fmtDMS(moon.hcAtas)),
+      tRow("hc' [piringan tengah]","If(hc' a > 0, hc' a + Ref + Dip, hc' a)", fmtNum(moon.hcTengah), fmtDMS(moon.hcTengah)),
+      tRow("hc' [piringan bawah]","If(hc' a > 0, hc' a - s.d.c + Ref + Dip, hc' a)", fmtNum(moon.hcBawah), fmtDMS(moon.hcBawah)),
+
+      tRow('Umur',"Ghurub (Gr WD) – Waktu Ijtima' (WD)", fmtNum(moon.umur), fmtJam(moon.umur)),
+      tRow('Azm',"Tan⁻¹( ((-Sin(Lt) / Tan(t)) + Cos(Lt) × Tan(δ) / Sin(t)))+270", fmtNum(sun.Azm), fmtDMS(sun.Azm)),
+      tRow('Azc',"Tan⁻¹( ((-Sin(Lt) / Tan(tc)) + Cos(Lt) × Tan(δc) / Sin(tc)))+270", fmtNum(moon.Azc), fmtDMS(moon.Azc)),
+      tRow('z',"Azc - Azm", fmtNum(moon.z), fmtDMS(moon.z)),
+      tRow('Dc',"If(PTc<PT,((PTc+360)-PT)/15,(PTc-PT)/15)", fmtNum(moon.Dc), fmtJam(moon.Dc)),
+      tRow('AL',"Cos⁻¹( Cos( |hc' - h| ) × Cos( |Azc - Azm| ))", fmtNum(moon.AL), fmtDMS(moon.AL)),
+      tRow('Cw',"( 1 - Cos(AL) ) ×s.d.c × 60", fmtNum(moon.Cw) + ' mt', fmtDMS(moon.Cw)),
+      tRow('EL',"Cos⁻¹( Cos((Mo - S')) × Cos(L'))", fmtNum(moon.EL), fmtDMS(moon.EL)),
+      tRow('FIa',"Cos⁻¹( -Cos( EL ))", fmtNum(moon.FIa), fmtDMS(moon.FIa)),
+      tRow('FI',"IF(hc'<0,0,((1+Cos(FIa))/2)×100)", fmtNum(moon.FI)+ ' %', fmtDMS(moon.FI)),
+      tRow('Ms',"Gr_WD+Dc", fmtNum(moon.Ms), fmtJam(moon.Ms)),
+      tRow('Mukts',"If(hc'<0,0,Dc)", fmtNum(moon.Mukts), fmtJam(moon.Mukts)),
+      tRow('Miring',"Tan⁻¹( (azc - azm) / hc' )", fmtNum(moon.Miring), fmtDMS(moon.Miring))
+    ].join('');
+    document.getElementById('tbl_h_bulan').innerHTML = htmlMoon;
+
+    // KESIMPULAN PRINT
+    document.getElementById('p_ijt_hari').textContent = konv.hari;
+    document.getElementById('p_ijt_tgl').textContent = `${konv.tglF} ${NAMA_BULAN_M[konv.blnF]} ${konv.thnF}`;
+    document.getElementById('p_ijt_jam').textContent = fmtJam(konv.wdF);
+    document.querySelectorAll('.p_tz').forEach(e => e.textContent = tzName(tz));
+
+    let TglObs = jdToMasehi(jdFinal.JD + tz/24);
+    let wdJD = Math.floor(jdFinal.JD + 0.5 + tz/24);
+    let hrObs = HARI[mod(wdJD + 1, 7)];
+    document.getElementById('p_g_hari').textContent = hrObs;
+    document.getElementById('p_g_tgl').textContent = TglObs.d;
+    document.getElementById('p_g_bln').textContent = NAMA_BULAN_M[TglObs.m];
+    document.getElementById('p_g_thn').textContent = TglObs.y;
+    document.getElementById('p_maghrib').textContent = fmtJam(sun.GrWD);
+    document.getElementById('p_azm').textContent = fmtDMS(sun.Azm);
+    document.getElementById('p_azc').textContent = fmtDMS(moon.Azc);
+    document.getElementById('p_z').textContent = fmtDMS(moon.z);
+    document.getElementById('p_hc').textContent = fmtDMS(moon.hc);
+    document.getElementById('p_hcp').textContent = fmtDMS(moon.hcTengah);
+    document.getElementById('p_umur').textContent = fmtJam(moon.umur);
+    document.getElementById('p_el').textContent = fmtDMS(moon.EL);
+    document.getElementById('p_fi').textContent = fmtNum(moon.FI, 2) + '%';
+    document.getElementById('p_cw').textContent = fmtNum(moon.Cw, 2);
+    document.getElementById('p_mukts').textContent = fmtJam(moon.Mukts);
+    document.getElementById('p_ms').textContent = fmtJam(moon.Ms);
+    document.getElementById('p_miring').textContent = fmtDMS(moon.Miring);
+
+    // Kriteria & Kesimpulan (Hari Jatuh Awal Bulan)
+    let kriteria = document.getElementById('h_kriteria').value;
+    let hilalTerlihat = false;
+    let h_mari = moon.hcTengah, elong = moon.EL, umur = moon.umur;
+
+    if(kriteria === 'mabims') hilalTerlihat = (h_mari >= 3 && elong >= 6.4);
+    else if(kriteria === 'wujudul') hilalTerlihat = (h_mari > 0 && umur > 0);
+    else if(kriteria === 'danjon') hilalTerlihat = (elong >= 7);
+
+    let jd1 = wdJD;
+    // Bila memenuhi, 1 tanggal masehi setelah observasi adalah tanggal 1 hijriyah
+    if(hilalTerlihat) {
+      jd1 += 1;
+    } else {
+      // Istikmal, 1 tanggal masehi + 2
+      jd1 += 2;
+    }
+    let resMasehi = jdToMasehi(jd1 - 0.5);
+    let kesimpulanHari = HARI[mod(jd1 + 1, 7)];
+
+    document.getElementById('p_k_awalbulan').textContent = NAMA_BULAN_H[bAwal-1];
+    document.getElementById('p_k_hari').textContent = kesimpulanHari;
+    document.getElementById('p_k_tgl').textContent = `${resMasehi.d} ${NAMA_BULAN_M[resMasehi.m]} ${resMasehi.y}`;
+    document.getElementById('p_k_status').textContent = hilalTerlihat ? "Hilal Memenuhi Kriteria" : "Hilal Belum Memenuhi Kriteria (Istikmal)";
+    document.getElementById('p_k_status').style.color = hilalTerlihat ? "green" : "red";
+
+    document.getElementById('h_result').classList.add('visible');
+    openSubTab('h', 't1');
+  } catch(e) {
+    let err = document.getElementById('h_error');
+    err.style.display = 'block'; err.textContent = "Error: " + e.message;
+  }
+}
+
+function calcSun(jd, T, lat, lon, tz, tt) {
+  let Dip = (1.76 / 60) * Math.sqrt(Math.max(0, tt));
+  let S = mod360(280.46645 + 36000.76983 * T);
+  let m = mod360(357.5291 + 35999.0503 * T);
+  let N = mod360(125.04 - 1934.136 * T);
+  let Kp = (17.264 / 3600) * sind(N) + (0.206 / 3600) * sind(2 * N);
+  let Kpp = (-1.264 / 3600) * sind(2 * S);
+  let Rp = (9.23 / 3600) * cosd(N) - (0.09 / 3600) * cosd(2 * N);
+  let Rpp = (0.548 / 3600) * cosd(2 * S);
+  let Qp = 23.43929111 + Rp + Rpp - (46.815 / 3600) * T;
+  let E = (6898.06 / 3600) * sind(m) + (72.095 / 3600) * sind(2 * m) + (0.966 / 3600) * sind(3 * m);
+  let Sp = mod360(S + E + Kp + Kpp - (20.47 / 3600));
+  let delta = asind(sind(Sp) * sind(Qp));
+  let Pta = atand(tand(Sp) * cosd(Qp));
+  let PT = (Sp >= 0 && Sp < 90) ? Pta : (Sp >= 90 && Sp < 270) ? Pta + 180 : Pta + 360;
+  let e = norm180(S - PT) / 15;
+  let sdm = 0.267 / (1 - 0.017 * cosd(m));
+  let h = -(sdm + (34.5 / 60) + Dip);
+  let t = acosd(-tand(lat) * tand(delta) + sind(h) / (cosd(lat) * cosd(delta)));
+  let Azm = mod360(atand(((-sind(lat) / tand(t)) + cosd(lat) * tand(delta)) / sind(t)) + 270);
+  let GrLMT = t / 15 + (12 - e);
+  let GrWD = GrLMT + (((tz * 15) - lon) / 15);
+  let Ra = 1.00014 - 0.01671 * cosd(m) - 0.00014 * cosd(2 * m);
+  let R = Ra * 149597870;
+  return { Dip, S, m, N, Kp, Kpp, Rp, Rpp, Qp, E, Sp, delta, Pta, PT, e, sdm, h, t, Azm, GrLMT, GrWD, Ra, R };
+}
+
+function calcMoon(jd, T, sun, lat, lon, tt) {
+  let M = mod360(218.31617 + 481267.88088 * T);
+  let A = mod360(134.96292 + 477198.86753 * T);
+  let F = mod360(93.27283 + 483202.01873 * T);
+  let D = mod360(297.85027 + 445267.11135 * T);
+  let T1 = (22640 / 3600) * sind(A);
+  let T2 = (-4586 / 3600) * sind(A - 2 * D);
+  let T3 = (2370 / 3600) * sind(2 * D);
+  let T4 = (769 / 3600) * sind(2 * A);
+  let T5 = (-668 / 3600) * sind(sun.m);
+  let T6 = (-412 / 3600) * sind(2 * F);
+  let T7 = (-212 / 3600) * sind(2 * A - 2 * D);
+  let T8 = (-206 / 3600) * sind(A + sun.m - 2 * D);
+  let T9 = (192 / 3600) * sind(A + 2 * D);
+  let T10 = (-165 / 3600) * sind(sun.m - 2 * D);
+  let T11 = (148 / 3600) * sind(A - sun.m);
+  let T12 = (-125 / 3600) * sind(D);
+  let T13 = (-110 / 3600) * sind(A + sun.m);
+  let T14 = (-55 / 3600) * sind(2 * F - 2 * D);
+  let C = T1+T2+T3+T4+T5+T6+T7+T8+T9+T10+T11+T12+T13+T14;
+  let Mo = mod360(M + C + sun.Kp + sun.Kpp - (20.47 / 3600));
+  let Ap = A + T2 + T3 + T5;
+  let Lp = (18461/3600)*sind(F) + (1010/3600)*sind(A+F) + (1000/3600)*sind(A-F) - (624/3600)*sind(F-2*D) - (199/3600)*sind(A-F-2*D) - (167/3600)*sind(A+F-2*D);
+
+  let x = atand(sind(Mo) * tand(sun.Qp));
+  let y = Lp + x;
+
+  // Pembenahan inti Data Bulan:
+  // koordinat ekliptika Bulan (Mo, L') dikonversi ke asensio rekta dan deklinasi dengan atan2,
+  // sehingga kuadran tidak tertukar dan tinggi/azimuth Bulan tidak melompat salah.
+  let eqMoon = eclipticToEquatorial(Mo, Lp, sun.Qp);
+  let deltac = eqMoon.delta;
+  let PTc = eqMoon.alpha;
+  let Ptca = PTc;
+
+  let horMoon = horizontalFromEquatorial(PTc, deltac, lat, jd, lon);
+  let tc = mod360(horMoon.H);
+  let hc = horMoon.alt;
+
+  let p = (384401 * (1 - 0.00301401)) / (1 + 0.0549 * cosd(Ap + T1));
+  let HP = 0.9507 / (p / 384401);
+  let sdc = 0.5181 / (p / 384401) / 2;
+  let P = HP * cosd(hc);
+  let hca = hc - P;
+
+  // Refraksi dibuat stabil memakai rumus Bennett agar hasil tidak NaN saat dekat ufuk.
+  let Ref = refractionBennett(hca);
+
+  let hcAtas = hca + sdc + Ref + sun.Dip;
+  let hcTengah = hca + Ref + sun.Dip;
+  let hcBawah = hca - sdc + Ref + sun.Dip;
+
+  let Azc = horMoon.az;
+  let z = norm180(Azc - sun.Azm);
+
+  // Lama hilal di atas ufuq dihitung dari posisi Bulan saat ghurub sampai Bulan terbenam.
+  let Dc = moonSetDeltaHours(hcTengah, horMoon.H, deltac, lat, sdc);
+
+  let AL = acosd(cosd(Math.abs(hcTengah - sun.h)) * cosd(Math.abs(z)));
+  let Cw = (1 - cosd(AL)) * sdc * 60;
+  let EL = acosd(cosd(Mo - sun.Sp) * cosd(Lp));
+  let FIa = acosd(-cosd(EL));
+
+  let FI = hcTengah < 0 ? 0 : ((1 + cosd(FIa)) / 2) * 100;
+  let Ms = sun.GrWD + Dc;
+  let Mukts = hcTengah < 0 ? 0 : Dc;
+
+  let Miring = Math.abs(hcTengah) < 1e-6 ? 0 : atand(z / hcTengah);
+
+  return { M, A, F, D, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, C, Mo, Ap, Lp, x, y, deltac, Ptca, PTc, tc, hc, p, HP, sdc, P, Ref, hca, hcAtas, hcTengah, hcBawah, Azc, z, Dc, AL, Cw, EL, FIa, FI, Ms, Mukts, Miring, umur: 0 };
+}
+
+
+// --- ALGORITMA GERHANA BULAN ---
+function hitungGerhana() {
+  try {
+    let err = document.getElementById('g_error'); err.style.display = 'none';
+    let tz = +document.getElementById('g_tz').value;
+    let mode = document.getElementById('g_mode').value;
+    let targetTxt = "";
+    let K = 0;
+
+    if (mode === 'hijri') {
+      let bH = +document.getElementById('g_bulanH').value;
+      let tH = +document.getElementById('g_tahunH').value;
+      let HY = tH + (bH * 29.53) / 354.3671;
+      K = Math.round((HY - 1410) * 12) - 0.5;
+      targetTxt = `Bulan ${NAMA_BULAN_H[bH-1]} ${tH} H`;
+    } else {
+      let dm = +document.getElementById('g_tglM').value;
+      let mm = +document.getElementById('g_blnM').value;
+      let ym = +document.getElementById('g_thnM').value;
+      let jd = gregorianToJD(ym, mm, dm, 12, tz).JD;
+      let rawK = (jd - 2447740.651689) / 29.530588853;
+      K = Math.round(rawK - 0.5) + 0.5;
+      targetTxt = `Tanggal ${dm} ${NAMA_BULAN_M[mm]} ${ym} M`;
+    }
+
+    let T = K / 1200, T2 = T*T, T3 = T2*T;
+    let F = mod360(164.2159288 + 390.67050274*K - 0.0016341*T2 - 0.00000227*T3);
+    let JD = 2447740.651689 + 29.530588853*K + 0.0001337*T2 - 0.00000015*T3;
+    let M = mod360(207.9623868 + 29.10535669*K - 0.0000218*T2);
+    let Mp = mod360(111.1797657 + 385.81693528*K + 0.0107438*T2 + 0.00001239*T3);
+    let Om = mod360(326.4991207 - 1.5637558*K + 0.0020691*T2 + 0.00000215*T3);
+    let F1 = F - 0.02665 * sind(Om);
+    let A1 = 285.9142682 + 0.107408*K - 0.009173*T2;
+    let E = 1 - 0.002516*T - 0.0000074*T2;
+
+    let T1 = -0.4065 * sind(Mp);
+    let T2_ = 0.1727 * E * sind(M);
+    let T3_ = 0.0161 * sind(2*Mp);
+    let T4 = -0.0097 * sind(2*F1);
+    let T5 = 0.0073 * E * sind(Mp-M);
+    let T6 = -0.005 * E * sind(Mp+M);
+    let T7 = -0.0023 * sind(Mp - 2*F1);
+    let T8 = 0.0021 * E * sind(2*M);
+    let T9 = 0.0012 * sind(Mp + 2*F1);
+    let T10 = 0.0006 * E * sind(2*Mp + M);
+    let T11 = -0.0004 * sind(3*Mp);
+    let T12 = -0.0003 * E * sind(M + 2*F1);
+    let T13 = 0.0003 * sind(A1);
+    let T14 = -0.0002 * E * sind(M + 2*F1);
+    let T15 = -0.0002 * E * sind(2*Mp - M);
+    let T16 = -0.0002 * sind(Om);
+    let MT = T1+T2_+T3_+T4+T5+T6+T7+T8+T9+T10+T11+T12+T13+T14+T15+T16;
+
+    let JD_Ist = JD + 0.5 + MT + tz/24;
+    let T0 = frac(JD_Ist) * 24;
+    let konvG = konversi(JD_Ist, 0);
+
+    let htmlDasar = [
+      mode==='hijri' ? tRow('HY','TahunH+(BlnH×29.53)/354.3671', fmtNum(K+1410), '—') : '',
+      tRow('K','Round((HY-1410)×12) - 0.5', K, '—'),
+      tRow('T','K/1200', fmtNum(T), '—'),
+      tRow('F','(164.2159288 + 390.67050274 × K ...', fmtNum(F), fmtDMS(F)),
+      tRow('JD','2447740.651689 + 29.530588853 × K ...', fmtNum(JD), '—'),
+      tRow('M','(207.9623868 + 29.10535669 × K ...', fmtNum(M), fmtDMS(M)),
+      tRow("M'",'(111.1797657 + 385.81693528 × K ...', fmtNum(Mp), fmtDMS(Mp)),
+      tRow('Ω','(326.4991207 - 1.5637558 × K ...', fmtNum(Om), fmtDMS(Om)),
+      tRow('F1','F - 0.02665 × Sin Ω', fmtNum(F1), fmtDMS(F1)),
+      tRow('A1','285.9142682 + 0.107408 × K ...', fmtNum(A1), fmtDMS(A1)),
+      tRow('E','1 - 0.002516 × T - 0.0000074 × T²', fmtNum(E), '—'),
+      tRow('T1',"-0.4065 × Sin(M')", fmtNum(T1), fmtDMS(T1)),
+      tRow('T2','0.1727 × E × Sin(M)', fmtNum(T2_), fmtDMS(T2_)),
+      tRow('T3',"0.0161 × Sin(2 × M')", fmtNum(T3_), fmtDMS(T3_)),
+      tRow('T4','-0.0097 × Sin(2 × F1)', fmtNum(T4), fmtDMS(T4)),
+      tRow('T5',"0.0073 × E × Sin(M' - M)", fmtNum(T5), fmtDMS(T5)),
+      tRow('T6',"-0.005 × E × Sin(M' + M)", fmtNum(T6), fmtDMS(T6)),
+      tRow('T7',"-0.0023 × Sin(M' - 2 × F1)", fmtNum(T7), fmtDMS(T7)),
+      tRow('T8','0.0021 × E × Sin(2 × M)', fmtNum(T8), fmtDMS(T8)),
+      tRow('T9',"0.0012 × Sin(M' + 2 × F1)", fmtNum(T9), fmtDMS(T9)),
+      tRow('T10',"0.0006 × E × Sin(2 × M' + M)", fmtNum(T10), fmtDMS(T10)),
+      tRow('T11',"-0.0004 × Sin(3 × M')", fmtNum(T11), fmtDMS(T11)),
+      tRow('T12','-0.0003 × E × Sin(M + 2 × F1)', fmtNum(T12), fmtDMS(T12)),
+      tRow('T13','0.0003 × Sin(A1)', fmtNum(T13), fmtDMS(T13)),
+      tRow('T14','-0.0002 × E × Sin(M + 2 × F1)', fmtNum(T14), fmtDMS(T14)),
+      tRow('T15',"-0.0002 × E × Sin(2 × M' - M)", fmtNum(T15), fmtDMS(T15)),
+      tRow('T16','-0.0002 × Sin(Ω)', fmtNum(T16), fmtDMS(T16)),
+      tRow('MT','Jumlah (T1 s/d T16)', fmtNum(MT), fmtDMS(MT)),
+      tRow('JD_Ist','JD + 0.5 + MT + TZ/24', fmtNum(JD_Ist), '—'),
+      tRow('T0 WD','Frac(JD_Ist) x 24', fmtNum(T0), fmtJam(T0))
+    ].join('');
+    document.getElementById('tbl_g_dasar').innerHTML = htmlDasar;
+
+    let htmlGK = [
+      tRow2('Z', "Int(JD_Ist)", konvG.Z), tRow2('AA', "Int((Z-1867216.25)/36524.25)", konvG.AA),
+      tRow2('A', "Z+1+AA-Int(AA/4)", konvG.A), tRow2('B', "A+1524", konvG.B),
+      tRow2('C', "Int((B-122.1)/365.25)", konvG.C), tRow2('D', "Int(365.25×C)", konvG.D),
+      tRow2('E', "Int((B-D)/30.6001)", konvG.E), tRow2('Tgl', "Int(B-D-Int(30.6001×E))", konvG.Tgl),
+      tRow2('Bln', "(E-1) mod 12", `${konvG.Bln} (${NAMA_BULAN_M[konvG.Bln]})`), tRow2('Thn', "Bln <= 2 : C-4715, > 2 : C-4716", konvG.Thn),
+      tRow2('Hr', "(Z+2) mod 7", `${konvG.Hr} = ${konvG.hari}`), tRow2('Ps', "(Z+1) mod 5", `${konvG.Ps} = ${konvG.pasaran}`)
+    ].join('');
+    document.getElementById('tbl_g_konversi').innerHTML = htmlGK;
+
+    // FASE GERHANA
+    let S1 = -0.0048 * E * cosd(M), S2 = 0.002 * E * cosd(2*M), S3 = -0.3299 * cosd(Mp), S4 = -0.006 * E * cosd(M+Mp), S5 = 0.0041 * E * cosd(M-Mp);
+    let S = 5.2207 + S1+S2+S3+S4+S5;
+    let C1 = 0.0024 * E * sind(2*M), C2 = -0.0392 * sind(Mp), C3 = 0.0116 * sind(2*Mp), C4 = -0.0073 * E * sind(M+Mp), C5 = -0.0067 * E * sind(M-Mp), C6 = 0.0118 * sind(2*F);
+    let Cv = 0.207 * sind(M) + C1+C2+C3+C4+C5+C6;
+    let W = Math.abs(cosd(F1));
+    let Y = (S * sind(F1) + Cv * cosd(F1)) * (1 - 0.0048 * W);
+    let U1 = 0.0046 * E * cosd(M), U2 = -0.0182 * cosd(Mp), U3 = 0.0004 * cosd(2*Mp), U4 = -0.0005 * cosd(M+Mp);
+    let U = 0.00059 + U1+U2+U3+U4;
+    let H = 1.5573 + U, P = 1.0128 - U, R = 0.4678 - U, N = 0.5458 + 0.04 * cosd(Mp);
+
+    let MG = (1.0128 - U - Math.abs(Y)) / 0.545;
+    let status = MG <= 0 ? "Tidak Gerhana" : (MG < 1 ? "Partial (Sebagian)" : "Gerhana Total");
+
+    let dur = (rad) => rad > 0 ? (60 / N * Math.sqrt(rad) / 60) : NaN;
+    let G_T1 = dur(H*H - Y*Y), G_T2 = dur(P*P - Y*Y), G_T3 = dur(R*R - Y*Y);
+    let W1 = T0 - G_T1, W2 = T0 - G_T2, W3 = T0 - G_T3;
+    let W4 = T0 + G_T3, W5 = T0 + G_T2, W6 = T0 + G_T1;
+
+    let fmtT = (x) => isNaN(x) ? '—' : fmtJam(x);
+
+    let htmlWaktu = [
+      tRow('S1','-0.0048 × E × Cos(M)', fmtNum(S1), fmtDMS(S1)),
+      tRow('S2','0.002 × E × Cos(2 × M)', fmtNum(S2), fmtDMS(S2)),
+      tRow('S3',"-0.3299 × Cos(M')", fmtNum(S3), fmtDMS(S3)),
+      tRow('S4',"-0.006 × E × Cos(M + M')", fmtNum(S4), fmtDMS(S4)),
+      tRow('S5',"0.0041 × E × Cos(M - M')", fmtNum(S5), fmtDMS(S5)),
+      tRow('S','5.2207 + Jumlah (S1 s/d S5)', fmtNum(S), fmtDMS(S)),
+      tRow('C1','0.0024 × E × Sin(2 × M)', fmtNum(C1), fmtDMS(C1)),
+      tRow('C2',"-0.0392 × Sin(M')", fmtNum(C2), fmtDMS(C2)),
+      tRow('C3',"0.0116 × Sin(2 × M')", fmtNum(C3), fmtDMS(C3)),
+      tRow('C4',"-0.0073 × E × Sin(M + M')", fmtNum(C4), fmtDMS(C4)),
+      tRow('C5',"-0.0067 × E × Sin(M - M')", fmtNum(C5), fmtDMS(C5)),
+      tRow('C6','0.0118 × Sin(2 × F)', fmtNum(C6), fmtDMS(C6)),
+      tRow('C','0.207 × sin M + Jumlah (C1 s/d C6)', fmtNum(Cv), fmtDMS(Cv)),
+      tRow('W','|cos(F1)|', fmtNum(W), '—'),
+      tRow('Y','S × Sin(F1) + C × Cos(F1) × (1 - 0.0048 × W)', fmtNum(Y), fmtDMS(Y)),
+      tRow('U1','0.0046 × E × Cos(M)', fmtNum(U1), fmtDMS(U1)),
+      tRow('U2',"-0.0182 × Cos(M')", fmtNum(U2), fmtDMS(U2)),
+      tRow('U3',"0.0004 × Cos(2 × M')", fmtNum(U3), fmtDMS(U3)),
+      tRow('U4',"-0.0005 × Cos(M + M')", fmtNum(U4), fmtDMS(U4)),
+      tRow('U','0.00059 + Jumlah(U1 s/d U4)', fmtNum(U), fmtDMS(U)),
+      tRow('H','1.5573 + U', fmtNum(H), fmtDMS(H)),
+      tRow('P','1.0128 - U', fmtNum(P), fmtDMS(P)),
+      tRow('R','0.4678 - U', fmtNum(R), fmtDMS(R)),
+      tRow('N',"0.5458 + 0.04 × Cos(M')", fmtNum(N), fmtDMS(N)),
+      tRow('MG','( 1.0128 - U - |Y| ) / 0.545', fmtNum(MG), '—'),
+      tRow('Grhna','Status Gerhana (<=0 Tidak, <1 Parsial, >1 Total)', status, '—'),
+      tRow('T1','60 / N × √(H² - |Y|²) / 60', fmtNum(G_T1), fmtJam(G_T1)),
+      tRow('T2','60 / N × √(P² - |Y|²) / 60', fmtNum(G_T2), fmtJam(G_T2)),
+      tRow('T3','60 / N × √(R² - |Y|²) / 60', fmtNum(G_T3), fmtJam(G_T3)),
+      tRow('W1','T0 - T1', fmtNum(W1), fmtT(W1)),
+      tRow('W2','T0 - T2', fmtNum(W2), fmtT(W2)),
+      tRow('W3','T0 - T3', fmtNum(W3), fmtT(W3)),
+      tRow('T0','T0', fmtNum(T0), fmtT(T0)),
+      tRow('W4','T0 + T3', fmtNum(W4), fmtT(W4)),
+      tRow('W5','T0 + T2', fmtNum(W5), fmtT(W5)),
+      tRow('W6','T0 + T1', fmtNum(W6), fmtT(W6))
+    ].join('');
+    document.getElementById('tbl_g_waktu').innerHTML = htmlWaktu;
+
+    // PRINT KESIMPULAN
+    document.getElementById('p_g_target').textContent = targetTxt;
+    document.getElementById('p_g_status').textContent = status;
+    document.getElementById('p_g_status').style.color = (status === "Tidak Gerhana") ? "red" : "green";
+
+    document.querySelectorAll('.p_g_tz').forEach(e => e.textContent = tzName(tz));
+
+    document.getElementById('e_w1').textContent = fmtT(W1);
+    document.getElementById('e_w2').textContent = fmtT(W2);
+    document.getElementById('e_w3').textContent = fmtT(W3);
+    document.getElementById('e_t0').textContent = fmtT(T0);
+    document.getElementById('e_w4').textContent = fmtT(W4);
+    document.getElementById('e_w5').textContent = fmtT(W5);
+    document.getElementById('e_w6').textContent = fmtT(W6);
+
+    document.getElementById('g_result').classList.add('visible');
+    openSubTab('g', 't1');
+  } catch(e) {
+    let err = document.getElementById('g_error');
+    err.style.display = 'block'; err.textContent = "Error: " + e.message;
+  }
+}
+
+// Inisialisasi
+window.onload = () => { initDropdowns(); toggleGMode(); };
+</script>
+</body>
+</html>
